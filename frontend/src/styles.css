@@ -1,0 +1,285 @@
+/* Palette taken from semantica.org's live stylesheet (custom/style.css):
+   navy #1f3f7a / blue #4981bd hero gradient, sky-blue #87CEEB active-state accent,
+   Poppins headings + Roboto body. */
+:root {
+  color-scheme: light;
+  --navy: #1f3f7a;
+  --blue: #4981bd;
+  --sky: #87ceeb;
+  --sky-dark: #6bb6e0;
+  --border: #e2e6ee;
+  --bg-subtle: #f4f7fb;
+  --surface: #ffffff;
+  --text: #1c2430;
+  --text-muted: #6e7b90;
+  --positive: #1a7f37;
+  --negative: #cf222e;
+  --neutral: #6e7781;
+  --font-heading: "Poppins", system-ui, sans-serif;
+  --font-body: "Roboto", system-ui, sans-serif;
+  font-family: var(--font-body);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg-subtle);
+  color: var(--text);
+}
+
+h1, h2, h3 {
+  font-family: var(--font-heading);
+}
+
+.page {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding: 20px 28px;
+  border-radius: 12px;
+  background: linear-gradient(45deg, var(--blue) 0%, var(--navy) 100%);
+  color: #fff;
+  box-shadow: 0 8px 20px rgba(31, 63, 122, 0.18);
+}
+
+.page-header h1 {
+  margin: 2px 0 0 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.page-header .link-button {
+  color: #fff;
+}
+
+.link-button {
+  background: none;
+  border: none;
+  color: var(--blue);
+  cursor: pointer;
+  padding: 0;
+  font-size: 0.95rem;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.link-button:hover {
+  color: var(--sky-dark);
+}
+
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(45deg, var(--blue) 0%, var(--navy) 100%);
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 340px;
+  padding: 36px;
+  background: var(--surface);
+  border-radius: 14px;
+  box-shadow: 0 20px 45px rgba(15, 30, 60, 0.35);
+}
+
+.login-form h1 {
+  margin: 0;
+  color: var(--navy);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.subtitle {
+  margin: 0 0 8px 0;
+  color: var(--text-muted);
+}
+
+.login-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+input {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 1rem;
+  font-family: var(--font-body);
+  background: var(--surface);
+  color: var(--text);
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(73, 129, 189, 0.2);
+}
+
+button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  background: linear-gradient(135deg, var(--blue), var(--navy));
+  color: #fff;
+  cursor: pointer;
+  font-family: var(--font-heading);
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(31, 63, 122, 0.3);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: default;
+  transform: none;
+  box-shadow: none;
+}
+
+.sync-panel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.sync-status {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.summary-bar {
+  display: flex;
+  gap: 32px;
+  padding: 20px 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 14px rgba(31, 63, 122, 0.06);
+}
+
+.summary-label {
+  display: block;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.summary-value {
+  display: block;
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--navy);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(31, 63, 122, 0.06);
+}
+
+.data-table th,
+.data-table td {
+  text-align: left;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.data-table th {
+  font-family: var(--font-heading);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #fff;
+  background: var(--navy);
+}
+
+.data-table tbody tr:hover {
+  background: rgba(135, 206, 235, 0.12);
+}
+
+.data-table a {
+  color: var(--blue);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.data-table a:hover {
+  color: var(--sky-dark);
+  text-decoration: underline;
+}
+
+.empty-row {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 24px;
+}
+
+.price-cell input {
+  width: 100px;
+  padding: 6px 8px;
+}
+
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.badge-positive {
+  color: var(--positive);
+  background: rgba(26, 127, 55, 0.12);
+}
+
+.badge-negative {
+  color: var(--negative);
+  background: rgba(207, 34, 46, 0.12);
+}
+
+.badge-neutral {
+  color: var(--neutral);
+  background: var(--bg-subtle);
+}
+
+.error-text {
+  color: var(--negative);
+  font-size: 0.9rem;
+}
+
+.error-text.small {
+  font-size: 0.75rem;
+}
