@@ -1,0 +1,23 @@
+services:
+  backend:
+    build: ./backend
+    env_file:
+      - ./backend/.env
+    environment:
+      # Always persisted on the named volume below, regardless of what's in .env
+      DATABASE_URL: sqlite:////data/billing_report.db
+      ION_TOKEN_CACHE_PATH: /data/.ion_token_cache.json
+    volumes:
+      - backend_data:/data
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  backend_data:

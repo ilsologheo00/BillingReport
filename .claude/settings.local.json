@@ -27,7 +27,11 @@
       "Bash(python3 -c \"import sys,json; print\\(len\\(json.load\\(sys.stdin\\)\\)\\)\")",
       "Bash(\".venv/Scripts/python.exe\" \"C:\\\\Users\\\\ggiorgi\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Projects-BillingReport\\\\70705d43-aa31-4619-854d-108cf8e945f5\\\\scratchpad\\\\scan_sentinel.py\")",
       "Bash(python3 -c ' *)",
-      "Bash(\".venv/Scripts/python.exe\" \"C:\\\\Users\\\\ggiorgi\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Projects-BillingReport\\\\70705d43-aa31-4619-854d-108cf8e945f5\\\\scratchpad\\\\run_ninja_sync.py\")"
+      "Bash(\".venv/Scripts/python.exe\" \"C:\\\\Users\\\\ggiorgi\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Projects-BillingReport\\\\70705d43-aa31-4619-854d-108cf8e945f5\\\\scratchpad\\\\run_ninja_sync.py\")",
+      "Bash(docker --version)",
+      "Bash(docker compose *)",
+      "PowerShell(docker --version 2>&1)",
+      "PowerShell(docker compose version 2>&1)"
     ]
   }
 }
