@@ -4,6 +4,7 @@ import { RequireAuth } from "./auth/RequireAuth";
 import { LoginPage } from "./pages/LoginPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { CustomerDetailPage } from "./pages/CustomerDetailPage";
+import { NinjaOneMappingPage } from "./pages/NinjaOneMappingPage";
 
 export default function App() {
   return (
@@ -24,6 +25,14 @@ export default function App() {
             element={
               <RequireAuth>
                 <CustomerDetailPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/ninjaone-mapping"
+            element={
+              <RequireAuth>
+                <NinjaOneMappingPage />
               </RequireAuth>
             }
           />

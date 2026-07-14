@@ -15,7 +15,19 @@
       "Bash(python3 -c \"import pypdf\")",
       "Bash(python3 -c \"import fitz\")",
       "Bash(pdftotext -layout \"C:\\\\Users\\\\ggiorgi\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Projects-BillingReport\\\\70705d43-aa31-4619-854d-108cf8e945f5\\\\scratchpad\\\\ion_api_guide.pdf\" \"C:\\\\Users\\\\ggiorgi\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Projects-BillingReport\\\\70705d43-aa31-4619-854d-108cf8e945f5\\\\scratchpad\\\\ion_api_guide.txt\")",
-      "Bash(python3 -c \"import time; print\\(time.time\\(\\) + 7200\\)\")"
+      "Bash(python3 -c \"import time; print\\(time.time\\(\\) + 7200\\)\")",
+      "WebFetch(domain:www.ninjaone.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:www.postman.com)",
+      "Bash(npx tsc *)",
+      "PowerShell(Get-Process -Id \\(Get-NetTCPConnection -LocalPort 8000\\).OwningProcess | Select-Object Id,ProcessName)",
+      "WebFetch(domain:app.ninjarmm.com)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" -X POST \"https://app.ninjarmm.com/oauth/token\" -d \"grant_type=client_credentials&client_id=CTshjSH12bPULRLVsY02jDMSFFw&client_secret=ULQIShkKE3NwyYo7_JYaqZhyf8KhE0MaVDhb76W8ABjiunaYbMYjzg&scope=monitoring\")",
+      "Bash(curl -s -X POST \"https://app.ninjarmm.com/oauth/token\" -d \"grant_type=client_credentials&client_id=CTshjSH12bPULRLVsY02jDMSFFw&client_secret=ULQIShkKE3NwyYo7_JYaqZhyf8KhE0MaVDhb76W8ABjiunaYbMYjzg&scope=monitoring\")",
+      "Bash(python3 -c \"import sys,json; print\\(len\\(json.load\\(sys.stdin\\)\\)\\)\")",
+      "Bash(\".venv/Scripts/python.exe\" \"C:\\\\Users\\\\ggiorgi\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Projects-BillingReport\\\\70705d43-aa31-4619-854d-108cf8e945f5\\\\scratchpad\\\\scan_sentinel.py\")",
+      "Bash(python3 -c ' *)",
+      "Bash(\".venv/Scripts/python.exe\" \"C:\\\\Users\\\\ggiorgi\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Projects-BillingReport\\\\70705d43-aa31-4619-854d-108cf8e945f5\\\\scratchpad\\\\run_ninja_sync.py\")"
     ]
   }
 }

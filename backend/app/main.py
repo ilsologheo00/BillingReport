@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
 from app.database import Base, SessionLocal, engine
-from app.routers import auth, customers, prices, report, sync
+from app.routers import auth, customers, ninjaone_sync, prices, report, sync
 from app.seed import seed_admin_user
 
 app = FastAPI(title="BillingReport API")
@@ -18,6 +18,7 @@ app.add_middleware(
 
 app.include_router(auth.router)
 app.include_router(sync.router)
+app.include_router(ninjaone_sync.router)
 app.include_router(customers.router)
 app.include_router(prices.router)
 app.include_router(report.router)

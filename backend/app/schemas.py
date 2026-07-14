@@ -28,6 +28,19 @@ class SyncLogResponse(BaseModel):
         from_attributes = True
 
 
+class NinjaSyncLogResponse(BaseModel):
+    id: int
+    started_at: datetime
+    finished_at: Optional[datetime]
+    status: str
+    orgs_matched: int
+    orgs_unmatched: int
+    error_message: Optional[str]
+
+    class Config:
+        from_attributes = True
+
+
 class LicenseLineOut(BaseModel):
     id: int
     sku: str
@@ -56,6 +69,8 @@ class CustomerSummaryOut(BaseModel):
     total_margin: Optional[Decimal] = None
     margin_pct: Optional[Decimal] = None
     line_count: int
+    device_count: Optional[int] = None
+    sentinelone_count: Optional[int] = None
 
 
 class CustomerDetailOut(BaseModel):
@@ -67,6 +82,8 @@ class CustomerDetailOut(BaseModel):
     total_price: Optional[Decimal] = None
     total_margin: Optional[Decimal] = None
     margin_pct: Optional[Decimal] = None
+    device_count: Optional[int] = None
+    sentinelone_count: Optional[int] = None
 
 
 class ReportSummaryOut(BaseModel):
@@ -81,3 +98,18 @@ class SellPriceUpsert(BaseModel):
     customer_id: int
     sku: str
     unit_price: Decimal
+
+
+class NinjaOrgStatOut(BaseModel):
+    org_name: str
+    device_count: int
+    sentinelone_count: int
+    synced_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class NinjaOrgMappingUpsert(BaseModel):
+    org_name: str
+    customer_id: int

@@ -34,6 +34,11 @@ class Customer(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+    ninja_org_name = Column(String, nullable=True)
+    device_count = Column(Integer, nullable=True)
+    sentinelone_count = Column(Integer, nullable=True)
+    ninja_synced_at = Column(DateTime, nullable=True)
+
     license_lines = relationship("LicenseLine", back_populates="customer", cascade="all, delete-orphan")
     sell_prices = relationship("SellPrice", back_populates="customer", cascade="all, delete-orphan")
 
@@ -81,3 +86,33 @@ class SyncLog(Base):
     customers_synced = Column(Integer, default=0)
     lines_synced = Column(Integer, default=0)
     error_message = Column(Text, nullable=True)
+
+
+class NinjaSyncLog(Base):
+    __tablename__ = "ninja_sync_logs"
+
+    id = Column(Integer, primary_key=True)
+    started_at = Column(DateTime, default=datetime.utcnow)
+    finished_at = Column(DateTime, nullable=True)
+    status = Column(String, default="running")  # running | success | failed
+    orgs_matched = Column(Integer, default=0)
+    orgs_unmatched = Column(Integer, default=0)
+    error_message = Column(Text, nullable=True)
+
+
+class NinjaOrgStat(Base):
+    """Latest per-organization stats from NinjaOne, plus the customer it's
+    linked to (via automatic name matching or a manual mapping). Kept for
+    every org NinjaOne returns, matched or not, so unmatched orgs can be
+    shown for manual mapping without re-hitting the NinjaOne API."""
+
+    __tablename__ = "ninja_org_stats"
+
+    id = Column(Integer, primary_key=True)
+    org_name = Column(String, unique=True, nullable=False, index=True)
+    device_count = Column(Integer, default=0)
+    sentinelone_count = Column(Integer, default=0)
+    customer_id = Column(Integer, ForeignKey("customers.id"), nullable=True)
+    synced_at = Column(DateTime, default=datetime.utcnow)
+
+    customer = relationship("Customer")

@@ -8,6 +8,16 @@ export interface SyncLog {
   error_message: string | null;
 }
 
+export interface NinjaSyncLog {
+  id: number;
+  started_at: string;
+  finished_at: string | null;
+  status: "running" | "success" | "failed";
+  orgs_matched: number;
+  orgs_unmatched: number;
+  error_message: string | null;
+}
+
 export interface CustomerSummary {
   id: number;
   name: string;
@@ -17,6 +27,8 @@ export interface CustomerSummary {
   total_margin: string | null;
   margin_pct: string | null;
   line_count: number;
+  device_count: number | null;
+  sentinelone_count: number | null;
 }
 
 export interface LicenseLine {
@@ -47,6 +59,8 @@ export interface CustomerDetail {
   total_price: string | null;
   total_margin: string | null;
   margin_pct: string | null;
+  device_count: number | null;
+  sentinelone_count: number | null;
 }
 
 export interface ReportSummary {
@@ -55,4 +69,11 @@ export interface ReportSummary {
   total_price: string | null;
   total_margin: string | null;
   margin_pct: string | null;
+}
+
+export interface NinjaOrgStat {
+  org_name: string;
+  device_count: number;
+  sentinelone_count: number;
+  synced_at: string;
 }

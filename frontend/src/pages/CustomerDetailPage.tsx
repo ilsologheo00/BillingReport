@@ -96,6 +96,14 @@ export function CustomerDetailPage() {
             <MarginBadge margin={customer.total_margin} marginPct={customer.margin_pct} />
           </span>
         </div>
+        <div>
+          <span className="summary-label">Devices</span>
+          <span className="summary-value">{customer.device_count ?? "—"}</span>
+        </div>
+        <div>
+          <span className="summary-label">SentinelOne</span>
+          <span className="summary-value">{customer.sentinelone_count ?? "—"}</span>
+        </div>
       </div>
 
       <table className="data-table">

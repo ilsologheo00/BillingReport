@@ -2,17 +2,20 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getCustomers, getReportSummary } from "../api/customers";
 import { getSyncStatus } from "../api/sync";
+import { getNinjaOneSyncStatus } from "../api/ninjaone";
 import { useAuth } from "../auth/AuthContext";
 import { MoneyCell } from "../components/MoneyCell";
 import { MarginBadge } from "../components/MarginBadge";
 import { SyncButton } from "../components/SyncButton";
-import type { CustomerSummary, ReportSummary, SyncLog } from "../api/types";
+import { NinjaOneSyncButton } from "../components/NinjaOneSyncButton";
+import type { CustomerSummary, NinjaSyncLog, ReportSummary, SyncLog } from "../api/types";
 
 export function DashboardPage() {
   const { logout } = useAuth();
   const [customers, setCustomers] = useState<CustomerSummary[]>([]);
   const [summary, setSummary] = useState<ReportSummary | null>(null);
   const [lastSync, setLastSync] = useState<SyncLog | null>(null);
+  const [lastNinjaSync, setLastNinjaSync] = useState<NinjaSyncLog | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -27,6 +30,11 @@ export function DashboardPage() {
         setLastSync(await getSyncStatus());
       } catch {
         setLastSync(null);
+      }
+      try {
+        setLastNinjaSync(await getNinjaOneSyncStatus());
+      } catch {
+        setLastNinjaSync(null);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load data");
@@ -50,6 +58,10 @@ export function DashboardPage() {
       </header>
 
       <SyncButton lastSync={lastSync} onSynced={(log) => { setLastSync(log); refresh(); }} />
+      <NinjaOneSyncButton lastSync={lastNinjaSync} onSynced={(log) => { setLastNinjaSync(log); refresh(); }} />
+      <Link to="/ninjaone-mapping" className="link-button">
+        Map unmatched NinjaOne organizations{lastNinjaSync ? ` (${lastNinjaSync.orgs_unmatched})` : ""}
+      </Link>
 
       {error && <div className="error-text">{error}</div>}
 
@@ -87,6 +99,8 @@ export function DashboardPage() {
               <th>Total cost</th>
               <th>Total price</th>
               <th>Margin</th>
+              <th>Devices</th>
+              <th>SentinelOne</th>
             </tr>
           </thead>
           <tbody>
@@ -101,11 +115,13 @@ export function DashboardPage() {
                 <td>
                   <MarginBadge margin={c.total_margin} marginPct={c.margin_pct} />
                 </td>
+                <td>{c.device_count ?? "—"}</td>
+                <td>{c.sentinelone_count ?? "—"}</td>
               </tr>
             ))}
             {customers.length === 0 && (
               <tr>
-                <td colSpan={5} className="empty-row">
+                <td colSpan={7} className="empty-row">
                   No customers yet — click "Sync Now" to pull data from ION.
                 </td>
               </tr>

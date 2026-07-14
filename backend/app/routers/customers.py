@@ -29,6 +29,8 @@ def list_customers(db: Session = Depends(get_db), _user: User = Depends(get_curr
                 total_margin=totals.total_margin,
                 margin_pct=totals.margin_pct,
                 line_count=totals.line_count,
+                device_count=customer.device_count,
+                sentinelone_count=customer.sentinelone_count,
             )
         )
     return results
@@ -75,4 +77,6 @@ def get_customer(customer_id: int, db: Session = Depends(get_db), _user: User = 
         total_price=totals.total_price,
         total_margin=totals.total_margin,
         margin_pct=totals.margin_pct,
+        device_count=customer.device_count,
+        sentinelone_count=customer.sentinelone_count,
     )

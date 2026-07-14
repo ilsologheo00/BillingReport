@@ -76,9 +76,11 @@ class LiveIonProvider:
             return datetime.fromisoformat(str(value).replace("Z", "+00:00")).date()
 
         billing = (raw.get("billingData") or [{}])[0]
-        unit_cost = raw.get("customerCost")
-        if unit_cost in (None, 0):
-            unit_cost = billing.get("sellerCost", 0)
+        total_cost = raw.get("customerCost")
+        if total_cost in (None, 0):
+            total_cost = billing.get("sellerCost", 0)
+        quantity = int(raw.get("subscriptionTotalLicenses") or 0)
+        unit_cost = (total_cost or 0) / quantity if quantity else (total_cost or 0)
 
         return IonLicenseLineDTO(
             ion_line_id=str(raw.get("id") or raw.get("subscriptionId")),
@@ -86,8 +88,8 @@ class LiveIonProvider:
             sku=raw.get("ccpSkuId") or raw.get("subscriptionSkuId", ""),
             product_name=raw.get("subscriptionName", ""),
             vendor=str(raw.get("cloudProviderId", "")),
-            quantity=int(raw.get("subscriptionTotalLicenses") or 0),
-            unit_cost=unit_cost or 0,
+            quantity=quantity,
+            unit_cost=unit_cost,
             term_start=_parse_date(raw.get("subscriptionStartDate")),
             term_end=_parse_date(raw.get("subscriptionEndDate")),
             billing_period=raw.get("subscriptionBillingCycle"),

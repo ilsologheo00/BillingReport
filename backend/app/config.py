@@ -24,6 +24,15 @@ class Settings(BaseSettings):
     ion_customers_path: str = "/api/v3/accounts/{account_id}/customers"
     ion_subscriptions_path: str = "/api/v3/accounts/{account_id}/subscriptions"
 
+    # NinjaOne integration
+    ninjaone_mode: str = "mock"  # "mock" | "live"
+    ninjaone_token_url: str = "https://app.ninjarmm.com/oauth/token"
+    ninjaone_base_url: str = "https://app.ninjarmm.com"
+    ninjaone_client_id: str = ""
+    ninjaone_client_secret: str = ""
+    ninjaone_scope: str = "monitoring"
+    ninjaone_sentinelone_match: str = "sentinelone"
+
     # CORS
     frontend_origin: str = "http://localhost:5173"
 
