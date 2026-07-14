@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { getCustomer } from "../api/customers";
 import { updatePrice } from "../api/prices";
+import { AppShell } from "../components/AppShell";
 import { MoneyCell } from "../components/MoneyCell";
 import { MarginBadge } from "../components/MarginBadge";
+import { SkeletonStatBar, SkeletonTable } from "../components/Skeleton";
 import type { CustomerDetail, LicenseLine } from "../api/types";
 
 function PriceCell({ customerId, line, onUpdated }: { customerId: number; line: LicenseLine; onUpdated: () => void }) {
@@ -67,84 +69,100 @@ export function CustomerDetailPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [customerId]);
 
-  if (error) return <div className="page error-text">{error}</div>;
-  if (!customer) return <div className="page">Loading…</div>;
+  if (error) {
+    return (
+      <AppShell>
+        <div className="page error-text">{error}</div>
+      </AppShell>
+    );
+  }
 
   return (
-    <div className="page">
-      <header className="page-header">
-        <div>
-          <Link to="/" className="link-button">
-            ← Back
-          </Link>
-          <h1>{customer.name}</h1>
-        </div>
-      </header>
+    <AppShell>
+      <div className="page">
+        <header className="page-header">
+          <div>
+            <Link to="/" className="link-button">
+              ← Back
+            </Link>
+            <h1>{customer?.name ?? "Loading…"}</h1>
+          </div>
+        </header>
 
-      <div className="summary-bar">
-        <div>
-          <span className="summary-label">Total cost</span>
-          <span className="summary-value"><MoneyCell value={customer.total_cost} /></span>
-        </div>
-        <div>
-          <span className="summary-label">Total price</span>
-          <span className="summary-value"><MoneyCell value={customer.total_price} /></span>
-        </div>
-        <div>
-          <span className="summary-label">Margin</span>
-          <span className="summary-value">
-            <MarginBadge margin={customer.total_margin} marginPct={customer.margin_pct} />
-          </span>
-        </div>
-        <div>
-          <span className="summary-label">Devices</span>
-          <span className="summary-value">{customer.device_count ?? "—"}</span>
-        </div>
-        <div>
-          <span className="summary-label">SentinelOne</span>
-          <span className="summary-value">{customer.sentinelone_count ?? "—"}</span>
-        </div>
+        {!customer ? (
+          <>
+            <SkeletonStatBar count={5} />
+            <SkeletonTable rows={5} cols={8} />
+          </>
+        ) : (
+          <>
+            <div className="summary-bar">
+              <div>
+                <span className="summary-label">Total cost</span>
+                <span className="summary-value"><MoneyCell value={customer.total_cost} /></span>
+              </div>
+              <div>
+                <span className="summary-label">Total price</span>
+                <span className="summary-value"><MoneyCell value={customer.total_price} /></span>
+              </div>
+              <div>
+                <span className="summary-label">Margin</span>
+                <span className="summary-value">
+                  <MarginBadge margin={customer.total_margin} marginPct={customer.margin_pct} />
+                </span>
+              </div>
+              <div>
+                <span className="summary-label">Devices</span>
+                <span className="summary-value">{customer.device_count ?? "—"}</span>
+              </div>
+              <div>
+                <span className="summary-label">SentinelOne</span>
+                <span className="summary-value">{customer.sentinelone_count ?? "—"}</span>
+              </div>
+            </div>
+
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Vendor</th>
+                  <th>SKU</th>
+                  <th>Qty</th>
+                  <th>Unit cost</th>
+                  <th>Unit price</th>
+                  <th>Margin</th>
+                  <th>Billing</th>
+                </tr>
+              </thead>
+              <tbody>
+                {customer.license_lines.map((line) => (
+                  <tr key={line.id}>
+                    <td>{line.product_name}</td>
+                    <td>{line.vendor}</td>
+                    <td>{line.sku}</td>
+                    <td>{line.quantity}</td>
+                    <td><MoneyCell value={line.unit_cost} /></td>
+                    <td>
+                      <PriceCell customerId={customer.id} line={line} onUpdated={refresh} />
+                    </td>
+                    <td>
+                      <MarginBadge margin={line.total_margin} marginPct={line.margin_pct} />
+                    </td>
+                    <td>{line.billing_period ?? "—"}</td>
+                  </tr>
+                ))}
+                {customer.license_lines.length === 0 && (
+                  <tr>
+                    <td colSpan={8} className="empty-row">
+                      No license lines for this customer.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </>
+        )}
       </div>
-
-      <table className="data-table">
-        <thead>
-          <tr>
-            <th>Product</th>
-            <th>Vendor</th>
-            <th>SKU</th>
-            <th>Qty</th>
-            <th>Unit cost</th>
-            <th>Unit price</th>
-            <th>Margin</th>
-            <th>Billing</th>
-          </tr>
-        </thead>
-        <tbody>
-          {customer.license_lines.map((line) => (
-            <tr key={line.id}>
-              <td>{line.product_name}</td>
-              <td>{line.vendor}</td>
-              <td>{line.sku}</td>
-              <td>{line.quantity}</td>
-              <td><MoneyCell value={line.unit_cost} /></td>
-              <td>
-                <PriceCell customerId={customer.id} line={line} onUpdated={refresh} />
-              </td>
-              <td>
-                <MarginBadge margin={line.total_margin} marginPct={line.margin_pct} />
-              </td>
-              <td>{line.billing_period ?? "—"}</td>
-            </tr>
-          ))}
-          {customer.license_lines.length === 0 && (
-            <tr>
-              <td colSpan={8} className="empty-row">
-                No license lines for this customer.
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-    </div>
+    </AppShell>
   );
 }

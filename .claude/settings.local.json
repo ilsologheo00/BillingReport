@@ -31,7 +31,13 @@
       "Bash(docker --version)",
       "Bash(docker compose *)",
       "PowerShell(docker --version 2>&1)",
-      "PowerShell(docker compose version 2>&1)"
+      "PowerShell(docker compose version 2>&1)",
+      "Skill(dataviz)",
+      "Skill(dataviz:*)",
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" \"http://localhost:5173/\")",
+      "Bash(curl -s \"http://localhost:5173/src/App.tsx\" -o /dev/null -w \"HTTP %{http_code} \\(App.tsx via vite\\)\\\\n\")",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)"
     ]
   }
 }

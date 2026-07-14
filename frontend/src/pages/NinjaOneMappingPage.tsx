@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getCustomers } from "../api/customers";
 import { getUnmappedOrgs, saveOrgMapping } from "../api/ninjaone";
+import { AppShell } from "../components/AppShell";
+import { SkeletonTable } from "../components/Skeleton";
 import type { CustomerSummary, NinjaOrgStat } from "../api/types";
 
 function MappingRow({
@@ -85,45 +87,47 @@ export function NinjaOneMappingPage() {
   }
 
   return (
-    <div className="page">
-      <header className="page-header">
-        <div>
-          <Link to="/" className="link-button">
-            ← Back
-          </Link>
-          <h1>Map NinjaOne organizations</h1>
-        </div>
-      </header>
+    <AppShell>
+      <div className="page">
+        <header className="page-header">
+          <div>
+            <Link to="/" className="link-button">
+              ← Back
+            </Link>
+            <h1>Map NinjaOne organizations</h1>
+          </div>
+        </header>
 
-      {error && <div className="error-text">{error}</div>}
+        {error && <div className="error-text">{error}</div>}
 
-      {loading ? (
-        <p>Loading…</p>
-      ) : (
-        <table className="data-table">
-          <thead>
-            <tr>
-              <th>NinjaOne organization</th>
-              <th>Devices</th>
-              <th>SentinelOne</th>
-              <th>Customer</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {orgs.map((org) => (
-              <MappingRow key={org.org_name} org={org} customers={customers} onMapped={handleMapped} />
-            ))}
-            {orgs.length === 0 && (
+        {loading ? (
+          <SkeletonTable rows={5} cols={5} />
+        ) : (
+          <table className="data-table">
+            <thead>
               <tr>
-                <td colSpan={5} className="empty-row">
-                  No unmapped organizations — everything is matched.
-                </td>
+                <th>NinjaOne organization</th>
+                <th>Devices</th>
+                <th>SentinelOne</th>
+                <th>Customer</th>
+                <th></th>
               </tr>
-            )}
-          </tbody>
-        </table>
-      )}
-    </div>
+            </thead>
+            <tbody>
+              {orgs.map((org) => (
+                <MappingRow key={org.org_name} org={org} customers={customers} onMapped={handleMapped} />
+              ))}
+              {orgs.length === 0 && (
+                <tr>
+                  <td colSpan={5} className="empty-row">
+                    No unmapped organizations — everything is matched.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </AppShell>
   );
 }
