@@ -1,16 +1,18 @@
-"""Real StreamOne ION API client.
+"""Real StreamOne ION (TD SYNNEX) v3 API client.
 
-Exact endpoint paths and response shapes are not yet confirmed against ION API
-documentation (no credentials were available at build time). Everything about
-where to call is env-configurable via `Settings` (see app/config.py); the only
-thing that should need to change once real docs/credentials arrive is the
-`_map_customer` / `_map_line` response-mapping methods below, and possibly the
-token request shape in `_fetch_token` if ION deviates from standard OAuth2
-client-credentials.
+Auth flow per the official "STREAMONE ION V3 API's Consumption guide": there is
+no client_id/client_secret client_credentials grant. Instead an initial
+refresh_token is issued from the ION admin portal, and is exchanged for an
+access_token (valid 7200s) plus a *new* refresh_token (single-use, valid 32
+days) via POST {ion_token_url} with grant_type=refresh_token. The rotated
+refresh_token must be persisted, or the next sync will fail because the old
+one was already consumed.
 """
 
+import json
 import time
 from datetime import datetime
+from pathlib import Path
 
 import httpx
 
@@ -25,54 +27,116 @@ class LiveIonProvider:
         self._token_expires_at: float = 0.0
 
     def get_customers(self) -> list[IonCustomerDTO]:
-        data = self._get(self._settings.ion_customers_path)
-        items = data.get("items", data) if isinstance(data, dict) else data
-        return [self._map_customer(item) for item in items]
+        path = self._settings.ion_customers_path.format(account_id=self._settings.ion_account_id)
+        results = []
+        page_token = None
+        while True:
+            params = {"page_size": 200}
+            if page_token:
+                params["page_token"] = page_token
+            data = self._get(path, params)
+            results.extend(data.get("customers", []))
+            page_token = data.get("next_page_token") or data.get("nextPageToken")
+            if not page_token:
+                break
+        return [self._map_customer(item) for item in results]
 
     def get_license_lines(self) -> list[IonLicenseLineDTO]:
-        data = self._get(self._settings.ion_subscriptions_path)
-        items = data.get("items", data) if isinstance(data, dict) else data
-        return [self._map_line(item) for item in items]
+        path = self._settings.ion_subscriptions_path.format(account_id=self._settings.ion_account_id)
+        results = []
+        offset = 0
+        limit = 100
+        while True:
+            params = {"pagination.limit": limit, "pagination.offset": offset}
+            data = self._get(path, params)
+            batch = data.get("items", [])
+            results.extend(batch)
+            total = data.get("paginationResponse", {}).get("totalSize", len(results))
+            offset += len(batch)
+            if not batch or offset >= total:
+                break
+        return [self._map_line(item) for item in results]
 
     # -- internals -----------------------------------------------------
 
     def _map_customer(self, raw: dict) -> IonCustomerDTO:
+        # customerId referenced by subscriptions is the trailing segment of `name`
+        # (e.g. "accounts/24549/customers/446444"), not the `uid` field.
+        name = raw.get("name", "")
+        customer_id = name.rsplit("/", 1)[-1] if name else str(raw.get("uid", ""))
         return IonCustomerDTO(
-            ion_customer_id=str(raw.get("id") or raw.get("customer_id")),
-            name=raw.get("name") or raw.get("company_name", ""),
+            ion_customer_id=customer_id,
+            name=raw.get("customerOrganization") or raw.get("customerName", ""),
         )
 
     def _map_line(self, raw: dict) -> IonLicenseLineDTO:
         def _parse_date(value):
             if not value:
                 return None
-            return datetime.fromisoformat(str(value)[:10]).date()
+            return datetime.fromisoformat(str(value).replace("Z", "+00:00")).date()
+
+        billing = (raw.get("billingData") or [{}])[0]
+        unit_cost = raw.get("customerCost")
+        if unit_cost in (None, 0):
+            unit_cost = billing.get("sellerCost", 0)
 
         return IonLicenseLineDTO(
-            ion_line_id=str(raw.get("id") or raw.get("subscription_id")),
-            ion_customer_id=str(raw.get("customer_id")),
-            sku=raw.get("sku") or raw.get("product_code", ""),
-            product_name=raw.get("product_name") or raw.get("name", ""),
-            vendor=raw.get("vendor") or raw.get("vendor_name", ""),
-            quantity=int(raw.get("quantity", 0)),
-            unit_cost=raw.get("unit_cost") or raw.get("cost", 0),
-            term_start=_parse_date(raw.get("term_start") or raw.get("start_date")),
-            term_end=_parse_date(raw.get("term_end") or raw.get("end_date")),
-            billing_period=raw.get("billing_period") or raw.get("period"),
+            ion_line_id=str(raw.get("id") or raw.get("subscriptionId")),
+            ion_customer_id=str(raw.get("customerId")),
+            sku=raw.get("ccpSkuId") or raw.get("subscriptionSkuId", ""),
+            product_name=raw.get("subscriptionName", ""),
+            vendor=str(raw.get("cloudProviderId", "")),
+            quantity=int(raw.get("subscriptionTotalLicenses") or 0),
+            unit_cost=unit_cost or 0,
+            term_start=_parse_date(raw.get("subscriptionStartDate")),
+            term_end=_parse_date(raw.get("subscriptionEndDate")),
+            billing_period=raw.get("subscriptionBillingCycle"),
         )
+
+    # -- token handling --------------------------------------------------
+
+    def _cache_path(self) -> Path:
+        path = Path(self._settings.ion_token_cache_path)
+        if not path.is_absolute():
+            path = Path(__file__).resolve().parents[3] / path
+        return path
+
+    def _load_cache(self) -> dict:
+        path = self._cache_path()
+        if path.exists():
+            try:
+                return json.loads(path.read_text())
+            except (json.JSONDecodeError, OSError):
+                pass
+        return {}
+
+    def _save_cache(self, refresh_token: str, access_token: str, expires_at: float) -> None:
+        path = self._cache_path()
+        path.write_text(json.dumps({
+            "refresh_token": refresh_token,
+            "access_token": access_token,
+            "expires_at": expires_at,
+        }))
 
     def _fetch_token(self) -> str:
         now = time.time()
         if self._token and now < self._token_expires_at - 60:
             return self._token
 
+        cache = self._load_cache()
+        if cache.get("access_token") and now < cache.get("expires_at", 0) - 60:
+            self._token = cache["access_token"]
+            self._token_expires_at = cache["expires_at"]
+            return self._token
+
+        refresh_token = cache.get("refresh_token") or self._settings.ion_refresh_token
+        if not refresh_token:
+            raise IonApiError("No ION refresh_token available (set ION_REFRESH_TOKEN or seed the token cache)")
+
         payload = {
-            "grant_type": "client_credentials",
-            "client_id": self._settings.ion_client_id,
-            "client_secret": self._settings.ion_client_secret,
+            "grant_type": "refresh_token",
+            "refresh_token": refresh_token,
         }
-        if self._settings.ion_scope:
-            payload["scope"] = self._settings.ion_scope
 
         try:
             with httpx.Client(timeout=30) as client:
@@ -83,14 +147,18 @@ class LiveIonProvider:
             raise IonApiError(f"Failed to obtain ION access token: {exc}") from exc
 
         token = body.get("access_token")
-        if not token:
-            raise IonApiError("ION token response did not contain an access_token")
+        new_refresh_token = body.get("refresh_token")
+        if not token or not new_refresh_token:
+            raise IonApiError("ION token response missing access_token or refresh_token")
+
+        expires_at = now + int(body.get("expires_in", 7200))
+        self._save_cache(new_refresh_token, token, expires_at)
 
         self._token = token
-        self._token_expires_at = now + int(body.get("expires_in", 3600))
+        self._token_expires_at = expires_at
         return token
 
-    def _get(self, path: str) -> dict | list:
+    def _get(self, path: str, params: dict | None = None) -> dict | list:
         token = self._fetch_token()
         url = f"{self._settings.ion_base_url.rstrip('/')}{path}"
         headers = {"Authorization": f"Bearer {token}"}
@@ -98,8 +166,8 @@ class LiveIonProvider:
         last_error: Exception | None = None
         for attempt in range(2):
             try:
-                with httpx.Client(timeout=30) as client:
-                    resp = client.get(url, headers=headers)
+                with httpx.Client(timeout=30, follow_redirects=True) as client:
+                    resp = client.get(url, headers=headers, params=params)
                 if resp.status_code >= 500 and attempt == 0:
                     last_error = IonApiError(f"ION returned {resp.status_code} for {url}")
                     continue

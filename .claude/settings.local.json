@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(netsh interface ipv4 show excludedportrange protocol=tcp)",
+      "PowerShell(Get-NetTCPConnection -LocalPort 8000 -ErrorAction SilentlyContinue)",
+      "PowerShell(Get-Process -Id \\(Get-NetTCPConnection -LocalPort 8000\\).OwningProcess -ErrorAction SilentlyContinue | Select-Object Id,ProcessName,Path)",
+      "PowerShell(Stop-Process -Id 32588 -Force)",
+      "PowerShell(Get-NetTCPConnection -LocalPort 5173 -ErrorAction SilentlyContinue | Select-Object OwningProcess | ForEach-Object { Get-Process -Id $_.OwningProcess -ErrorAction SilentlyContinue | Select-Object Id,ProcessName,Path })",
+      "PowerShell(Stop-Process -Id 32160 -Force -ErrorAction SilentlyContinue)",
+      "PowerShell(Get-NetTCPConnection -LocalPort 5173 -ErrorAction SilentlyContinue)",
+      "PowerShell(Invoke-RestMethod -Uri \"http://127.0.0.1:8000/api/health\")",
+      "WebFetch(domain:www.tdsynnex.com)",
+      "WebSearch",
+      "Bash(curl -sL \"https://www.tdsynnex.com/ion/v3api/assets/API%20Reference%20Guide_TDSynnex_v_0.1.pdf\" -o \"C:\\\\Users\\\\ggiorgi\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Projects-BillingReport\\\\70705d43-aa31-4619-854d-108cf8e945f5\\\\scratchpad\\\\ion_api_guide.pdf\")",
+      "Bash(python3 -c \"import pypdf\")",
+      "Bash(python3 -c \"import fitz\")",
+      "Bash(pdftotext -layout \"C:\\\\Users\\\\ggiorgi\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Projects-BillingReport\\\\70705d43-aa31-4619-854d-108cf8e945f5\\\\scratchpad\\\\ion_api_guide.pdf\" \"C:\\\\Users\\\\ggiorgi\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Projects-BillingReport\\\\70705d43-aa31-4619-854d-108cf8e945f5\\\\scratchpad\\\\ion_api_guide.txt\")",
+      "Bash(python3 -c \"import time; print\\(time.time\\(\\) + 7200\\)\")"
+    ]
+  }
+}

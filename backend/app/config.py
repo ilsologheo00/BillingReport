@@ -16,13 +16,13 @@ class Settings(BaseSettings):
 
     # ION integration
     ion_mode: str = "mock"  # "mock" | "live"
-    ion_token_url: str = "https://api.ion.stream.one/oauth/token"
-    ion_base_url: str = "https://api.ion.stream.one"
-    ion_client_id: str = ""
-    ion_client_secret: str = ""
-    ion_scope: str = ""
-    ion_customers_path: str = "/v1/customers"
-    ion_subscriptions_path: str = "/v1/subscriptions"
+    ion_token_url: str = "https://ion.tdsynnex.com/oauth/token"
+    ion_base_url: str = "https://ion.tdsynnex.com"
+    ion_account_id: str = ""
+    ion_refresh_token: str = ""
+    ion_token_cache_path: str = ".ion_token_cache.json"
+    ion_customers_path: str = "/api/v3/accounts/{account_id}/customers"
+    ion_subscriptions_path: str = "/api/v3/accounts/{account_id}/subscriptions"
 
     # CORS
     frontend_origin: str = "http://localhost:5173"

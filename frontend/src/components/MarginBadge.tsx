@@ -7,7 +7,7 @@ export function MarginBadge({ margin, marginPct }: { margin: string | null; marg
   const pct = marginPct !== null ? ` (${Number(marginPct).toFixed(1)}%)` : "";
   return (
     <span className={cls}>
-      {numMargin.toLocaleString(undefined, { style: "currency", currency: "USD" })}
+      {numMargin.toLocaleString(undefined, { style: "currency", currency: "EUR" })}
       {pct}
     </span>
   );
