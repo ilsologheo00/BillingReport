@@ -29,6 +29,11 @@ export interface CustomerSummary {
   line_count: number;
   device_count: number | null;
   sentinelone_count: number | null;
+  backup_total_bytes: string | null;
+  backup_used_bytes: string | null;
+  backup_available_bytes: string | null;
+  backup_machines_count: number | null;
+  backup_mailboxes_count: number | null;
 }
 
 export interface LicenseLine {
@@ -61,6 +66,11 @@ export interface CustomerDetail {
   margin_pct: string | null;
   device_count: number | null;
   sentinelone_count: number | null;
+  backup_total_bytes: string | null;
+  backup_used_bytes: string | null;
+  backup_available_bytes: string | null;
+  backup_machines_count: number | null;
+  backup_mailboxes_count: number | null;
 }
 
 export interface ReportSummary {
@@ -75,5 +85,25 @@ export interface NinjaOrgStat {
   org_name: string;
   device_count: number;
   sentinelone_count: number;
+  synced_at: string;
+}
+
+export interface AcronisSyncLog {
+  id: number;
+  started_at: string;
+  finished_at: string | null;
+  status: "running" | "success" | "failed";
+  tenants_matched: number;
+  tenants_unmatched: number;
+  error_message: string | null;
+}
+
+export interface AcronisOrgStat {
+  tenant_id: string;
+  tenant_name: string;
+  backup_total_bytes: string | null;
+  backup_used_bytes: string;
+  backup_machines_count: number;
+  backup_mailboxes_count: number;
   synced_at: string;
 }

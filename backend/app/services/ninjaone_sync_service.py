@@ -1,27 +1,10 @@
-import re
-from collections import defaultdict
 from datetime import datetime
 
 from sqlalchemy.orm import Session
 
 from app.models import Customer, NinjaOrgStat, NinjaSyncLog
+from app.services.name_matching import normalize_name, unique_normalized_index
 from app.services.ninjaone.base import NinjaApiError, NinjaOneProvider
-
-_LEGAL_SUFFIXES = ("srl", "spa", "snc", "sas", "sc")
-
-
-def _normalize_name(name: str) -> str:
-    """Lowercase, strip punctuation/whitespace, and drop a trailing Italian
-    legal-form suffix (e.g. "Semantica Srl" / "SEMANTICA S.R.L." -> "semantica")
-    so equivalent company names compare equal regardless of formatting."""
-    n = name.strip().lower().replace(".", "")
-    n = re.sub(r"[^\w\s]", " ", n)
-    n = re.sub(r"\s+", " ", n).strip()
-    for suffix in _LEGAL_SUFFIXES:
-        if n.endswith(f" {suffix}"):
-            n = n[: -(len(suffix) + 1)].strip()
-            break
-    return n
 
 
 def ninjaone_sync_all(db: Session, provider: NinjaOneProvider) -> NinjaSyncLog:
@@ -35,15 +18,11 @@ def ninjaone_sync_all(db: Session, provider: NinjaOneProvider) -> NinjaSyncLog:
         customers = db.query(Customer).all()
         customers_by_id = {c.id: c for c in customers}
         exact_by_name = {c.name.strip().lower(): c for c in customers}
-
-        normalized_groups: dict[str, list[Customer]] = defaultdict(list)
-        for c in customers:
-            normalized_groups[_normalize_name(c.name)].append(c)
         # Only trust the normalized match when it resolves to exactly one
         # customer - if two customers normalize to the same key (e.g. two
         # differently-formatted "Combitras" rows), matching by that key would
         # be a guess, so skip it and leave those unmatched.
-        normalized_unique = {k: v[0] for k, v in normalized_groups.items() if len(v) == 1}
+        normalized_unique = unique_normalized_index(customers, lambda c: c.name)
 
         org_rows = {row.org_name: row for row in db.query(NinjaOrgStat).all()}
 
@@ -66,7 +45,7 @@ def ninjaone_sync_all(db: Session, provider: NinjaOneProvider) -> NinjaSyncLog:
             if row.customer_id is None:
                 customer = exact_by_name.get(stat.org_name.strip().lower())
                 if customer is None:
-                    customer = normalized_unique.get(_normalize_name(stat.org_name))
+                    customer = normalized_unique.get(normalize_name(stat.org_name))
                 if customer is not None:
                     row.customer_id = customer.id
 

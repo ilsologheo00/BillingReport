@@ -71,6 +71,11 @@ class CustomerSummaryOut(BaseModel):
     line_count: int
     device_count: Optional[int] = None
     sentinelone_count: Optional[int] = None
+    backup_total_bytes: Optional[Decimal] = None
+    backup_used_bytes: Optional[Decimal] = None
+    backup_available_bytes: Optional[Decimal] = None
+    backup_machines_count: Optional[int] = None
+    backup_mailboxes_count: Optional[int] = None
 
 
 class CustomerDetailOut(BaseModel):
@@ -84,6 +89,11 @@ class CustomerDetailOut(BaseModel):
     margin_pct: Optional[Decimal] = None
     device_count: Optional[int] = None
     sentinelone_count: Optional[int] = None
+    backup_total_bytes: Optional[Decimal] = None
+    backup_used_bytes: Optional[Decimal] = None
+    backup_available_bytes: Optional[Decimal] = None
+    backup_machines_count: Optional[int] = None
+    backup_mailboxes_count: Optional[int] = None
 
 
 class ReportSummaryOut(BaseModel):
@@ -112,4 +122,35 @@ class NinjaOrgStatOut(BaseModel):
 
 class NinjaOrgMappingUpsert(BaseModel):
     org_name: str
+    customer_id: int
+
+
+class AcronisSyncLogResponse(BaseModel):
+    id: int
+    started_at: datetime
+    finished_at: Optional[datetime]
+    status: str
+    tenants_matched: int
+    tenants_unmatched: int
+    error_message: Optional[str]
+
+    class Config:
+        from_attributes = True
+
+
+class AcronisOrgStatOut(BaseModel):
+    tenant_id: str
+    tenant_name: str
+    backup_total_bytes: Optional[Decimal] = None
+    backup_used_bytes: Decimal
+    backup_machines_count: int
+    backup_mailboxes_count: int
+    synced_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class AcronisTenantMappingUpsert(BaseModel):
+    tenant_id: str
     customer_id: int

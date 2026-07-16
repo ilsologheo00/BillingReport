@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 from typing import Optional
 
-from app.models import LicenseLine, SellPrice
+from app.models import Customer, LicenseLine, SellPrice
 
 
 @dataclass
@@ -67,3 +67,14 @@ def aggregate_totals(line_margins: list[LineMargin]) -> Totals:
 
 def sell_price_lookup(prices: list[SellPrice]) -> dict[tuple[int, str], SellPrice]:
     return {(p.customer_id, p.sku): p for p in prices}
+
+
+def is_customer_empty(customer: Customer, line_count: int) -> bool:
+    """No license lines, no NinjaOne devices, no Acronis backup data - nothing worth showing."""
+    return (
+        line_count == 0
+        and not customer.device_count
+        and not customer.backup_used_bytes
+        and not customer.backup_machines_count
+        and not customer.backup_mailboxes_count
+    )

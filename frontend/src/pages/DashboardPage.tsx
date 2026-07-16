@@ -3,22 +3,26 @@ import { Link } from "react-router-dom";
 import { getCustomers, getReportSummary } from "../api/customers";
 import { getSyncStatus } from "../api/sync";
 import { getNinjaOneSyncStatus } from "../api/ninjaone";
+import { getAcronisSyncStatus } from "../api/acronis";
 import { AppShell } from "../components/AppShell";
 import { MoneyCell, formatMoney } from "../components/MoneyCell";
+import { BytesCell } from "../components/BytesCell";
 import { MarginBadge } from "../components/MarginBadge";
 import { SyncButton } from "../components/SyncButton";
 import { NinjaOneSyncButton } from "../components/NinjaOneSyncButton";
+import { AcronisSyncButton } from "../components/AcronisSyncButton";
 import { HorizontalBarChart } from "../components/BarChart";
 import { CoverageMeter } from "../components/CoverageMeter";
 import { SkeletonStatBar, SkeletonTable } from "../components/Skeleton";
-import { CustomersIcon, DeviceIcon, ShieldIcon, TrendUpIcon } from "../components/icons";
-import type { CustomerSummary, NinjaSyncLog, ReportSummary, SyncLog } from "../api/types";
+import { CloudIcon, CustomersIcon, DeviceIcon, ShieldIcon, TrendUpIcon } from "../components/icons";
+import type { AcronisSyncLog, CustomerSummary, NinjaSyncLog, ReportSummary, SyncLog } from "../api/types";
 
 export function DashboardPage() {
   const [customers, setCustomers] = useState<CustomerSummary[]>([]);
   const [summary, setSummary] = useState<ReportSummary | null>(null);
   const [lastSync, setLastSync] = useState<SyncLog | null>(null);
   const [lastNinjaSync, setLastNinjaSync] = useState<NinjaSyncLog | null>(null);
+  const [lastAcronisSync, setLastAcronisSync] = useState<AcronisSyncLog | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -38,6 +42,11 @@ export function DashboardPage() {
         setLastNinjaSync(await getNinjaOneSyncStatus());
       } catch {
         setLastNinjaSync(null);
+      }
+      try {
+        setLastAcronisSync(await getAcronisSyncStatus());
+      } catch {
+        setLastAcronisSync(null);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load data");
@@ -77,6 +86,10 @@ export function DashboardPage() {
           <NinjaOneSyncButton lastSync={lastNinjaSync} onSynced={(log) => { setLastNinjaSync(log); refresh(); }} />
           <Link to="/ninjaone-mapping" className="link-button">
             Map unmatched NinjaOne organizations{lastNinjaSync ? ` (${lastNinjaSync.orgs_unmatched})` : ""}
+          </Link>
+          <AcronisSyncButton lastSync={lastAcronisSync} onSynced={(log) => { setLastAcronisSync(log); refresh(); }} />
+          <Link to="/acronis-mapping" className="link-button">
+            Map unmatched Acronis tenants{lastAcronisSync ? ` (${lastAcronisSync.tenants_unmatched})` : ""}
           </Link>
         </div>
 
@@ -134,7 +147,7 @@ export function DashboardPage() {
         )}
 
         {loading ? (
-          <SkeletonTable rows={6} cols={7} />
+          <SkeletonTable rows={6} cols={10} />
         ) : (
           <table className="data-table">
             <thead>
@@ -146,6 +159,9 @@ export function DashboardPage() {
                 <th>Margin</th>
                 <th><DeviceIcon width={13} height={13} style={{ verticalAlign: "-2px" }} /> Devices</th>
                 <th><ShieldIcon width={13} height={13} style={{ verticalAlign: "-2px" }} /> SentinelOne</th>
+                <th><CloudIcon width={13} height={13} style={{ verticalAlign: "-2px" }} /> Backup used / total</th>
+                <th>Machines</th>
+                <th>Mailboxes</th>
               </tr>
             </thead>
             <tbody>
@@ -162,11 +178,22 @@ export function DashboardPage() {
                   </td>
                   <td>{c.device_count ?? "—"}</td>
                   <td>{c.sentinelone_count ?? "—"}</td>
+                  <td>
+                    {c.backup_used_bytes !== null ? (
+                      <>
+                        <BytesCell value={c.backup_used_bytes} /> / <BytesCell value={c.backup_total_bytes} />
+                      </>
+                    ) : (
+                      "—"
+                    )}
+                  </td>
+                  <td>{c.backup_machines_count ?? "—"}</td>
+                  <td>{c.backup_mailboxes_count ?? "—"}</td>
                 </tr>
               ))}
               {customers.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="empty-row">
+                  <td colSpan={10} className="empty-row">
                     No customers yet — click "Sync Now" to pull data from ION.
                   </td>
                 </tr>

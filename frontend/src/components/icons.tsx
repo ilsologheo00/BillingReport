@@ -99,3 +99,20 @@ export function TrendUpIcon(props: SVGProps<SVGSVGElement>) {
     </Icon>
   );
 }
+
+export function CloudIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Icon {...props}>
+      <path d="M7 18a4.5 4.5 0 0 1-.5-8.97A5.5 5.5 0 0 1 17.2 8.02 4 4 0 0 1 17 16H7a4.5 4.5 0 0 1 0 2z" />
+    </Icon>
+  );
+}
+
+export function MailIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Icon {...props}>
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <path d="M3 7l9 6 9-6" />
+    </Icon>
+  );
+}

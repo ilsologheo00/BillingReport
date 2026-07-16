@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 import { useTheme } from "../theme/ThemeContext";
-import { DashboardIcon, MapIcon, MoonIcon, SignOutIcon, SunIcon } from "./icons";
+import { CloudIcon, DashboardIcon, MapIcon, MoonIcon, SignOutIcon, SunIcon } from "./icons";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { logout } = useAuth();
@@ -24,6 +24,10 @@ export function AppShell({ children }: { children: ReactNode }) {
           <NavLink to="/ninjaone-mapping" className={({ isActive }) => `sidebar-link${isActive ? " active" : ""}`}>
             <MapIcon />
             NinjaOne mapping
+          </NavLink>
+          <NavLink to="/acronis-mapping" className={({ isActive }) => `sidebar-link${isActive ? " active" : ""}`}>
+            <CloudIcon />
+            Acronis mapping
           </NavLink>
         </nav>
 

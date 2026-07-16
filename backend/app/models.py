@@ -39,6 +39,13 @@ class Customer(Base):
     sentinelone_count = Column(Integer, nullable=True)
     ninja_synced_at = Column(DateTime, nullable=True)
 
+    acronis_tenant_name = Column(String, nullable=True)
+    backup_total_bytes = Column(Numeric(20, 0), nullable=True)
+    backup_used_bytes = Column(Numeric(20, 0), nullable=True)
+    backup_machines_count = Column(Integer, nullable=True)
+    backup_mailboxes_count = Column(Integer, nullable=True)
+    acronis_synced_at = Column(DateTime, nullable=True)
+
     license_lines = relationship("LicenseLine", back_populates="customer", cascade="all, delete-orphan")
     sell_prices = relationship("SellPrice", back_populates="customer", cascade="all, delete-orphan")
 
@@ -112,6 +119,39 @@ class NinjaOrgStat(Base):
     org_name = Column(String, unique=True, nullable=False, index=True)
     device_count = Column(Integer, default=0)
     sentinelone_count = Column(Integer, default=0)
+    customer_id = Column(Integer, ForeignKey("customers.id"), nullable=True)
+    synced_at = Column(DateTime, default=datetime.utcnow)
+
+    customer = relationship("Customer")
+
+
+class AcronisSyncLog(Base):
+    __tablename__ = "acronis_sync_logs"
+
+    id = Column(Integer, primary_key=True)
+    started_at = Column(DateTime, default=datetime.utcnow)
+    finished_at = Column(DateTime, nullable=True)
+    status = Column(String, default="running")  # running | success | failed
+    tenants_matched = Column(Integer, default=0)
+    tenants_unmatched = Column(Integer, default=0)
+    error_message = Column(Text, nullable=True)
+
+
+class AcronisOrgStat(Base):
+    """Latest per-tenant backup stats from Acronis, plus the customer it's
+    linked to (via automatic name matching or a manual mapping). Kept for
+    every customer-kind tenant Acronis returns, matched or not, so unmatched
+    tenants can be shown for manual mapping without re-hitting the API."""
+
+    __tablename__ = "acronis_org_stats"
+
+    id = Column(Integer, primary_key=True)
+    tenant_id = Column(String, unique=True, nullable=False, index=True)
+    tenant_name = Column(String, nullable=False)
+    backup_total_bytes = Column(Numeric(20, 0), default=0)
+    backup_used_bytes = Column(Numeric(20, 0), default=0)
+    backup_machines_count = Column(Integer, default=0)
+    backup_mailboxes_count = Column(Integer, default=0)
     customer_id = Column(Integer, ForeignKey("customers.id"), nullable=True)
     synced_at = Column(DateTime, default=datetime.utcnow)
 

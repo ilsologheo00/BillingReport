@@ -33,6 +33,12 @@ class Settings(BaseSettings):
     ninjaone_scope: str = "monitoring"
     ninjaone_sentinelone_match: str = "sentinelone"
 
+    # Acronis integration
+    acronis_mode: str = "mock"  # "mock" | "live"
+    acronis_datacenter: str = ""
+    acronis_client_id: str = ""
+    acronis_client_secret: str = ""
+
     # CORS
     frontend_origin: str = "http://localhost:5173"
 

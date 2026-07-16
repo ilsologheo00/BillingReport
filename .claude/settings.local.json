@@ -37,7 +37,11 @@
       "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" \"http://localhost:5173/\")",
       "Bash(curl -s \"http://localhost:5173/src/App.tsx\" -o /dev/null -w \"HTTP %{http_code} \\(App.tsx via vite\\)\\\\n\")",
       "Bash(git add *)",
-      "Bash(git commit -m ' *)"
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "WebFetch(domain:developer.acronis.com)",
+      "Bash(curl -sL \"https://developer.acronis.com/doc/account-management/v2/reference/openapi.json\" -o \"C:\\\\Users\\\\ggiorgi\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Projects-BillingReport\\\\70705d43-aa31-4619-854d-108cf8e945f5\\\\scratchpad\\\\acronis_account_openapi.json\" -w \"HTTP %{http_code}\\\\n\")",
+      "Bash(curl -sL \"https://developer.acronis.com/doc/resource-policy-management/v4/reference/openapi.json\" -o \"C:\\\\Users\\\\ggiorgi\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Projects-BillingReport\\\\70705d43-aa31-4619-854d-108cf8e945f5\\\\scratchpad\\\\acronis_rpm_openapi.json\" -w \"HTTP %{http_code}\\\\n\")"
     ]
   }
 }

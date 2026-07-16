@@ -4,6 +4,7 @@ import { getCustomer } from "../api/customers";
 import { updatePrice } from "../api/prices";
 import { AppShell } from "../components/AppShell";
 import { MoneyCell } from "../components/MoneyCell";
+import { BytesCell } from "../components/BytesCell";
 import { MarginBadge } from "../components/MarginBadge";
 import { SkeletonStatBar, SkeletonTable } from "../components/Skeleton";
 import type { CustomerDetail, LicenseLine } from "../api/types";
@@ -118,6 +119,30 @@ export function CustomerDetailPage() {
               <div>
                 <span className="summary-label">SentinelOne</span>
                 <span className="summary-value">{customer.sentinelone_count ?? "—"}</span>
+              </div>
+              <div>
+                <span className="summary-label">Backup used / total</span>
+                <span className="summary-value">
+                  {customer.backup_used_bytes !== null ? (
+                    <>
+                      <BytesCell value={customer.backup_used_bytes} /> / <BytesCell value={customer.backup_total_bytes} />
+                    </>
+                  ) : (
+                    "—"
+                  )}
+                </span>
+              </div>
+              <div>
+                <span className="summary-label">Backup available</span>
+                <span className="summary-value"><BytesCell value={customer.backup_available_bytes} /></span>
+              </div>
+              <div>
+                <span className="summary-label">Backed-up machines</span>
+                <span className="summary-value">{customer.backup_machines_count ?? "—"}</span>
+              </div>
+              <div>
+                <span className="summary-label">Backed-up mailboxes</span>
+                <span className="summary-value">{customer.backup_mailboxes_count ?? "—"}</span>
               </div>
             </div>
 

@@ -6,6 +6,7 @@ import { LoginPage } from "./pages/LoginPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { CustomerDetailPage } from "./pages/CustomerDetailPage";
 import { NinjaOneMappingPage } from "./pages/NinjaOneMappingPage";
+import { AcronisMappingPage } from "./pages/AcronisMappingPage";
 
 export default function App() {
   return (
@@ -35,6 +36,14 @@ export default function App() {
               element={
                 <RequireAuth>
                   <NinjaOneMappingPage />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/acronis-mapping"
+              element={
+                <RequireAuth>
+                  <AcronisMappingPage />
                 </RequireAuth>
               }
             />
