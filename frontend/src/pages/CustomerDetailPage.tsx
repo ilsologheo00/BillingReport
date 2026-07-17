@@ -5,6 +5,7 @@ import { updatePrice } from "../api/prices";
 import { AppShell } from "../components/AppShell";
 import { MoneyCell } from "../components/MoneyCell";
 import { BytesCell } from "../components/BytesCell";
+import { MailboxCoverageCell } from "../components/MailboxCoverageCell";
 import { MarginBadge } from "../components/MarginBadge";
 import { SkeletonStatBar, SkeletonTable } from "../components/Skeleton";
 import { useLanguage } from "../i18n/LanguageContext";
@@ -145,7 +146,9 @@ export function CustomerDetailPage() {
               </div>
               <div>
                 <span className="summary-label">{t("customerDetail.backedUpMailboxes")}</span>
-                <span className="summary-value">{customer.backup_mailboxes_count ?? "—"}</span>
+                <span className="summary-value">
+                  <MailboxCoverageCell backedUp={customer.backup_mailboxes_count} licensed={customer.exchange_online_licenses} />
+                </span>
               </div>
             </div>
 

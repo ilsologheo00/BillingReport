@@ -76,6 +76,7 @@ class CustomerSummaryOut(BaseModel):
     backup_available_bytes: Optional[Decimal] = None
     backup_machines_count: Optional[int] = None
     backup_mailboxes_count: Optional[int] = None
+    exchange_online_licenses: int = 0
 
 
 class CustomerDetailOut(BaseModel):
@@ -94,6 +95,7 @@ class CustomerDetailOut(BaseModel):
     backup_available_bytes: Optional[Decimal] = None
     backup_machines_count: Optional[int] = None
     backup_mailboxes_count: Optional[int] = None
+    exchange_online_licenses: int = 0
 
 
 class ReportSummaryOut(BaseModel):

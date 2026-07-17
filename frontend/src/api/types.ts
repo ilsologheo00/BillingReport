@@ -34,6 +34,7 @@ export interface CustomerSummary {
   backup_available_bytes: string | null;
   backup_machines_count: number | null;
   backup_mailboxes_count: number | null;
+  exchange_online_licenses: number;
 }
 
 export interface LicenseLine {
@@ -71,6 +72,7 @@ export interface CustomerDetail {
   backup_available_bytes: string | null;
   backup_machines_count: number | null;
   backup_mailboxes_count: number | null;
+  exchange_online_licenses: number;
 }
 
 export interface ReportSummary {

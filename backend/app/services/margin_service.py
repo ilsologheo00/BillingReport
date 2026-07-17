@@ -78,3 +78,11 @@ def is_customer_empty(customer: Customer, line_count: int) -> bool:
         and not customer.backup_machines_count
         and not customer.backup_mailboxes_count
     )
+
+
+def exchange_online_licenses(customer: Customer) -> int:
+    """Total quantity across Exchange Online license lines (any plan), so backed-up
+    mailbox counts from Acronis can be compared against what was actually purchased."""
+    return sum(
+        line.quantity for line in customer.license_lines if "exchange online" in line.product_name.lower()
+    )

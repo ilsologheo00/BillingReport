@@ -4,6 +4,7 @@ import { getCustomers, getReportSummary } from "../api/customers";
 import { AppShell } from "../components/AppShell";
 import { MoneyCell, formatMoney } from "../components/MoneyCell";
 import { BytesCell } from "../components/BytesCell";
+import { MailboxCoverageCell } from "../components/MailboxCoverageCell";
 import { MarginBadge } from "../components/MarginBadge";
 import { HorizontalBarChart } from "../components/BarChart";
 import { CoverageMeter } from "../components/CoverageMeter";
@@ -157,7 +158,9 @@ export function DashboardPage() {
                     )}
                   </td>
                   <td>{c.backup_machines_count ?? "—"}</td>
-                  <td>{c.backup_mailboxes_count ?? "—"}</td>
+                  <td>
+                    <MailboxCoverageCell backedUp={c.backup_mailboxes_count} licensed={c.exchange_online_licenses} />
+                  </td>
                 </tr>
               ))}
               {customers.length === 0 && (

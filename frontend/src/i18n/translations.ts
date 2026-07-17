@@ -34,6 +34,7 @@ export const translations = {
     "common.backupAvailable": "Backup available",
     "common.machines": "Machines",
     "common.mailboxes": "Mailboxes",
+    "common.mailboxesTooltip": "Backed up / Exchange Online licenses purchased",
     "common.notSet": "not set",
 
     "dashboard.eyebrow": "Overview",
@@ -114,6 +115,7 @@ export const translations = {
     "common.backupAvailable": "Backup disponibile",
     "common.machines": "Macchine",
     "common.mailboxes": "Caselle di posta",
+    "common.mailboxesTooltip": "Protette con backup / licenze Exchange Online acquistate",
     "common.notSet": "non impostato",
 
     "dashboard.eyebrow": "Panoramica",
