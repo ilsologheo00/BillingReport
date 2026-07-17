@@ -1,9 +1,11 @@
 import { useState, type FormEvent } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
+import { useLanguage } from "../i18n/LanguageContext";
 
 export function LoginPage() {
   const { token, login } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -22,7 +24,7 @@ export function LoginPage() {
       await login(username, password);
       navigate("/");
     } catch {
-      setError("Invalid username or password");
+      setError(t("login.invalid"));
     } finally {
       setSubmitting(false);
     }
@@ -32,18 +34,18 @@ export function LoginPage() {
     <div className="login-page">
       <form className="login-form" onSubmit={handleSubmit}>
         <h1>BillingReport</h1>
-        <p className="subtitle">License &amp; margin dashboard</p>
+        <p className="subtitle">{t("login.subtitle")}</p>
         <label>
-          Username
+          {t("login.username")}
           <input value={username} onChange={(e) => setUsername(e.target.value)} autoFocus />
         </label>
         <label>
-          Password
+          {t("login.password")}
           <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
         </label>
         {error && <div className="error-text">{error}</div>}
         <button type="submit" disabled={submitting}>
-          {submitting ? "Signing in…" : "Sign in"}
+          {submitting ? t("login.signingIn") : t("login.signIn")}
         </button>
       </form>
     </div>

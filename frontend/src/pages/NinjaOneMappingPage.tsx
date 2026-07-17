@@ -4,6 +4,7 @@ import { getCustomers } from "../api/customers";
 import { getUnmappedOrgs, saveOrgMapping } from "../api/ninjaone";
 import { AppShell } from "../components/AppShell";
 import { SkeletonTable } from "../components/Skeleton";
+import { useLanguage } from "../i18n/LanguageContext";
 import type { CustomerSummary, NinjaOrgStat } from "../api/types";
 
 function MappingRow({
@@ -15,6 +16,7 @@ function MappingRow({
   customers: CustomerSummary[];
   onMapped: (orgName: string) => void;
 }) {
+  const { t } = useLanguage();
   const [customerId, setCustomerId] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -27,7 +29,7 @@ function MappingRow({
       await saveOrgMapping(org.org_name, Number(customerId));
       onMapped(org.org_name);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to save mapping");
+      setError(err instanceof Error ? err.message : t("common.failedToSaveMapping"));
     } finally {
       setSaving(false);
     }
@@ -40,7 +42,7 @@ function MappingRow({
       <td>{org.sentinelone_count}</td>
       <td>
         <select value={customerId} onChange={(e) => setCustomerId(e.target.value)} disabled={saving}>
-          <option value="">Select customer…</option>
+          <option value="">{t("common.selectCustomer")}</option>
           {customers.map((c) => (
             <option key={c.id} value={c.id}>
               {c.name}
@@ -50,7 +52,7 @@ function MappingRow({
       </td>
       <td>
         <button onClick={save} disabled={saving || !customerId}>
-          {saving ? "Saving…" : "Save"}
+          {saving ? t("common.saving") : t("common.save")}
         </button>
         {error && <span className="error-text small">{error}</span>}
       </td>
@@ -59,6 +61,7 @@ function MappingRow({
 }
 
 export function NinjaOneMappingPage() {
+  const { t } = useLanguage();
   const [orgs, setOrgs] = useState<NinjaOrgStat[]>([]);
   const [customers, setCustomers] = useState<CustomerSummary[]>([]);
   const [loading, setLoading] = useState(true);
@@ -72,7 +75,7 @@ export function NinjaOneMappingPage() {
       setOrgs(unmapped);
       setCustomers(customerList);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load data");
+      setError(err instanceof Error ? err.message : t("common.failedToLoadData"));
     } finally {
       setLoading(false);
     }
@@ -80,6 +83,7 @@ export function NinjaOneMappingPage() {
 
   useEffect(() => {
     refresh();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function handleMapped(orgName: string) {
@@ -92,9 +96,9 @@ export function NinjaOneMappingPage() {
         <header className="page-header">
           <div>
             <Link to="/" className="link-button">
-              ← Back
+              {t("common.back")}
             </Link>
-            <h1>Map NinjaOne organizations</h1>
+            <h1>{t("ninjaMapping.title")}</h1>
           </div>
         </header>
 
@@ -106,10 +110,10 @@ export function NinjaOneMappingPage() {
           <table className="data-table">
             <thead>
               <tr>
-                <th>NinjaOne organization</th>
-                <th>Devices</th>
-                <th>SentinelOne</th>
-                <th>Customer</th>
+                <th>{t("ninjaMapping.table.org")}</th>
+                <th>{t("common.devices")}</th>
+                <th>{t("common.sentinelone")}</th>
+                <th>{t("dashboard.table.customer")}</th>
                 <th></th>
               </tr>
             </thead>
@@ -120,7 +124,7 @@ export function NinjaOneMappingPage() {
               {orgs.length === 0 && (
                 <tr>
                   <td colSpan={5} className="empty-row">
-                    No unmapped organizations — everything is matched.
+                    {t("ninjaMapping.empty")}
                   </td>
                 </tr>
               )}

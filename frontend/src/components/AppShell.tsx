@@ -2,11 +2,14 @@ import type { ReactNode } from "react";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 import { useTheme } from "../theme/ThemeContext";
-import { CloudIcon, DashboardIcon, MapIcon, MoonIcon, SignOutIcon, SunIcon } from "./icons";
+import { useLanguage } from "../i18n/LanguageContext";
+import { SyncSidebarSection } from "./SyncSidebarSection";
+import { CloudIcon, DashboardIcon, GlobeIcon, MapIcon, MoonIcon, SignOutIcon, SunIcon } from "./icons";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { logout } = useAuth();
   const { theme, toggle } = useTheme();
+  const { t, toggle: toggleLang } = useLanguage();
 
   return (
     <div className="app-shell">
@@ -19,26 +22,32 @@ export function AppShell({ children }: { children: ReactNode }) {
         <nav className="sidebar-nav">
           <NavLink to="/" end className={({ isActive }) => `sidebar-link${isActive ? " active" : ""}`}>
             <DashboardIcon />
-            Dashboard
+            {t("nav.dashboard")}
           </NavLink>
           <NavLink to="/ninjaone-mapping" className={({ isActive }) => `sidebar-link${isActive ? " active" : ""}`}>
             <MapIcon />
-            NinjaOne mapping
+            {t("nav.ninjaMapping")}
           </NavLink>
           <NavLink to="/acronis-mapping" className={({ isActive }) => `sidebar-link${isActive ? " active" : ""}`}>
             <CloudIcon />
-            Acronis mapping
+            {t("nav.acronisMapping")}
           </NavLink>
         </nav>
 
+        <SyncSidebarSection />
+
         <div className="sidebar-footer">
+          <button className="sidebar-link" onClick={toggleLang}>
+            <GlobeIcon />
+            {t("nav.language")}
+          </button>
           <button className="sidebar-link" onClick={toggle}>
             {theme === "light" ? <MoonIcon /> : <SunIcon />}
-            {theme === "light" ? "Dark mode" : "Light mode"}
+            {theme === "light" ? t("nav.darkMode") : t("nav.lightMode")}
           </button>
           <button className="sidebar-link" onClick={logout}>
             <SignOutIcon />
-            Sign out
+            {t("nav.signOut")}
           </button>
         </div>
       </aside>

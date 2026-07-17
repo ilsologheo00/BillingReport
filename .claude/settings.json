@@ -45,7 +45,11 @@
       "Bash(tail -n 15 /c/Users/ggiorgi/AppData/Local/Temp/claude/c--Projects-BillingReport/70705d43-aa31-4619-854d-108cf8e945f5/scratchpad/backend4.log)",
       "Bash(taskkill //F //PID 25520)",
       "Bash(taskkill //F //PID 32976)",
-      "Bash(taskkill //F //PID 35188)"
+      "Bash(taskkill //F //PID 35188)",
+      "Bash(git fetch *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)"
     ]
   }
 }

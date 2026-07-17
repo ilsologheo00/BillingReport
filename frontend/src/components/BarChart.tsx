@@ -8,10 +8,12 @@ export function HorizontalBarChart({
   items,
   formatValue,
   maxValue,
+  noDataLabel = "No data yet.",
 }: {
   items: BarChartItem[];
   formatValue: (value: number) => string;
   maxValue?: number;
+  noDataLabel?: string;
 }) {
   const max = maxValue ?? Math.max(...items.map((i) => i.value), 1);
 
@@ -36,7 +38,7 @@ export function HorizontalBarChart({
           </div>
         );
       })}
-      {items.length === 0 && <p className="empty-row">No data yet.</p>}
+      {items.length === 0 && <p className="empty-row">{noDataLabel}</p>}
     </div>
   );
 }

@@ -41,7 +41,8 @@
       "Bash(git push *)",
       "WebFetch(domain:developer.acronis.com)",
       "Bash(curl -sL \"https://developer.acronis.com/doc/account-management/v2/reference/openapi.json\" -o \"C:\\\\Users\\\\ggiorgi\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Projects-BillingReport\\\\70705d43-aa31-4619-854d-108cf8e945f5\\\\scratchpad\\\\acronis_account_openapi.json\" -w \"HTTP %{http_code}\\\\n\")",
-      "Bash(curl -sL \"https://developer.acronis.com/doc/resource-policy-management/v4/reference/openapi.json\" -o \"C:\\\\Users\\\\ggiorgi\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Projects-BillingReport\\\\70705d43-aa31-4619-854d-108cf8e945f5\\\\scratchpad\\\\acronis_rpm_openapi.json\" -w \"HTTP %{http_code}\\\\n\")"
+      "Bash(curl -sL \"https://developer.acronis.com/doc/resource-policy-management/v4/reference/openapi.json\" -o \"C:\\\\Users\\\\ggiorgi\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Projects-BillingReport\\\\70705d43-aa31-4619-854d-108cf8e945f5\\\\scratchpad\\\\acronis_rpm_openapi.json\" -w \"HTTP %{http_code}\\\\n\")",
+      "Bash(netstat -ano)"
     ]
   }
 }

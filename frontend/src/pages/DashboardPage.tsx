@@ -1,28 +1,23 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getCustomers, getReportSummary } from "../api/customers";
-import { getSyncStatus } from "../api/sync";
-import { getNinjaOneSyncStatus } from "../api/ninjaone";
-import { getAcronisSyncStatus } from "../api/acronis";
 import { AppShell } from "../components/AppShell";
 import { MoneyCell, formatMoney } from "../components/MoneyCell";
 import { BytesCell } from "../components/BytesCell";
 import { MarginBadge } from "../components/MarginBadge";
-import { SyncButton } from "../components/SyncButton";
-import { NinjaOneSyncButton } from "../components/NinjaOneSyncButton";
-import { AcronisSyncButton } from "../components/AcronisSyncButton";
 import { HorizontalBarChart } from "../components/BarChart";
 import { CoverageMeter } from "../components/CoverageMeter";
 import { SkeletonStatBar, SkeletonTable } from "../components/Skeleton";
+import { useLanguage } from "../i18n/LanguageContext";
+import { useSync } from "../sync/SyncContext";
 import { CloudIcon, CustomersIcon, DeviceIcon, ShieldIcon, TrendUpIcon } from "../components/icons";
-import type { AcronisSyncLog, CustomerSummary, NinjaSyncLog, ReportSummary, SyncLog } from "../api/types";
+import type { CustomerSummary, ReportSummary } from "../api/types";
 
 export function DashboardPage() {
+  const { t } = useLanguage();
+  const { version } = useSync();
   const [customers, setCustomers] = useState<CustomerSummary[]>([]);
   const [summary, setSummary] = useState<ReportSummary | null>(null);
-  const [lastSync, setLastSync] = useState<SyncLog | null>(null);
-  const [lastNinjaSync, setLastNinjaSync] = useState<NinjaSyncLog | null>(null);
-  const [lastAcronisSync, setLastAcronisSync] = useState<AcronisSyncLog | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,23 +28,8 @@ export function DashboardPage() {
       const [customerList, reportSummary] = await Promise.all([getCustomers(), getReportSummary()]);
       setCustomers(customerList);
       setSummary(reportSummary);
-      try {
-        setLastSync(await getSyncStatus());
-      } catch {
-        setLastSync(null);
-      }
-      try {
-        setLastNinjaSync(await getNinjaOneSyncStatus());
-      } catch {
-        setLastNinjaSync(null);
-      }
-      try {
-        setLastAcronisSync(await getAcronisSyncStatus());
-      } catch {
-        setLastAcronisSync(null);
-      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load data");
+      setError(err instanceof Error ? err.message : t("common.failedToLoadData"));
     } finally {
       setLoading(false);
     }
@@ -57,8 +37,9 @@ export function DashboardPage() {
 
   useEffect(() => {
     refresh();
+    // Re-fetch whenever a sync completes anywhere in the app (buttons live in the sidebar now, not on this page).
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [version]);
 
   const topMargin = [...customers]
     .filter((c) => c.total_margin !== null)
@@ -76,22 +57,10 @@ export function DashboardPage() {
       <div className="page">
         <header className="page-header">
           <div>
-            <p className="page-eyebrow">Overview</p>
-            <h1>Dashboard</h1>
+            <p className="page-eyebrow">{t("dashboard.eyebrow")}</p>
+            <h1>{t("dashboard.title")}</h1>
           </div>
         </header>
-
-        <div className="sync-panel">
-          <SyncButton lastSync={lastSync} onSynced={(log) => { setLastSync(log); refresh(); }} />
-          <NinjaOneSyncButton lastSync={lastNinjaSync} onSynced={(log) => { setLastNinjaSync(log); refresh(); }} />
-          <Link to="/ninjaone-mapping" className="link-button">
-            Map unmatched NinjaOne organizations{lastNinjaSync ? ` (${lastNinjaSync.orgs_unmatched})` : ""}
-          </Link>
-          <AcronisSyncButton lastSync={lastAcronisSync} onSynced={(log) => { setLastAcronisSync(log); refresh(); }} />
-          <Link to="/acronis-mapping" className="link-button">
-            Map unmatched Acronis tenants{lastAcronisSync ? ` (${lastAcronisSync.tenants_unmatched})` : ""}
-          </Link>
-        </div>
 
         {error && <div className="error-text">{error}</div>}
 
@@ -100,19 +69,19 @@ export function DashboardPage() {
         ) : summary ? (
           <div className="summary-bar">
             <div>
-              <span className="summary-label"><CustomersIcon width={14} height={14} /> Customers</span>
+              <span className="summary-label"><CustomersIcon width={14} height={14} /> {t("common.customers")}</span>
               <span className="summary-value">{summary.customer_count}</span>
             </div>
             <div>
-              <span className="summary-label">Total cost</span>
+              <span className="summary-label">{t("common.totalCost")}</span>
               <span className="summary-value"><MoneyCell value={summary.total_cost} /></span>
             </div>
             <div>
-              <span className="summary-label">Total price</span>
+              <span className="summary-label">{t("common.totalPrice")}</span>
               <span className="summary-value"><MoneyCell value={summary.total_price} /></span>
             </div>
             <div>
-              <span className="summary-label"><TrendUpIcon width={14} height={14} /> Total margin</span>
+              <span className="summary-label"><TrendUpIcon width={14} height={14} /> {t("dashboard.totalMargin")}</span>
               <span className="summary-value">
                 <MarginBadge margin={summary.total_margin} marginPct={summary.margin_pct} />
               </span>
@@ -123,16 +92,16 @@ export function DashboardPage() {
         {!loading && customers.length > 0 && (
           <div className="charts-grid">
             <div className="chart-card">
-              <h2>Top customers by margin</h2>
-              <p className="chart-subtitle">Highest total margin, current pricing</p>
-              <HorizontalBarChart items={topMargin} formatValue={(v) => formatMoney(String(v))} />
+              <h2>{t("dashboard.topMargin.title")}</h2>
+              <p className="chart-subtitle">{t("dashboard.topMargin.subtitle")}</p>
+              <HorizontalBarChart items={topMargin} formatValue={(v) => formatMoney(String(v))} noDataLabel={t("dashboard.topMargin.empty")} />
             </div>
             <div className="chart-card">
               <h2>
                 <ShieldIcon width={15} height={15} style={{ verticalAlign: "-2px", marginRight: 4 }} />
-                SentinelOne coverage
+                {t("dashboard.coverage.title")}
               </h2>
-              <p className="chart-subtitle">Share of NinjaOne devices with SentinelOne, by customer</p>
+              <p className="chart-subtitle">{t("dashboard.coverage.subtitle")}</p>
               {coverage.length > 0 ? (
                 <div className="bar-chart">
                   {coverage.map((c) => (
@@ -140,7 +109,7 @@ export function DashboardPage() {
                   ))}
                 </div>
               ) : (
-                <p className="empty-row">No NinjaOne device data yet.</p>
+                <p className="empty-row">{t("dashboard.coverage.empty")}</p>
               )}
             </div>
           </div>
@@ -152,16 +121,16 @@ export function DashboardPage() {
           <table className="data-table">
             <thead>
               <tr>
-                <th>Customer</th>
-                <th># Lines</th>
-                <th>Total cost</th>
-                <th>Total price</th>
-                <th>Margin</th>
-                <th><DeviceIcon width={13} height={13} style={{ verticalAlign: "-2px" }} /> Devices</th>
-                <th><ShieldIcon width={13} height={13} style={{ verticalAlign: "-2px" }} /> SentinelOne</th>
-                <th><CloudIcon width={13} height={13} style={{ verticalAlign: "-2px" }} /> Backup used / total</th>
-                <th>Machines</th>
-                <th>Mailboxes</th>
+                <th>{t("dashboard.table.customer")}</th>
+                <th>{t("dashboard.table.lines")}</th>
+                <th>{t("common.totalCost")}</th>
+                <th>{t("common.totalPrice")}</th>
+                <th>{t("common.margin")}</th>
+                <th><DeviceIcon width={13} height={13} style={{ verticalAlign: "-2px" }} /> {t("common.devices")}</th>
+                <th><ShieldIcon width={13} height={13} style={{ verticalAlign: "-2px" }} /> {t("common.sentinelone")}</th>
+                <th><CloudIcon width={13} height={13} style={{ verticalAlign: "-2px" }} /> {t("common.backupUsedTotal")}</th>
+                <th>{t("common.machines")}</th>
+                <th>{t("common.mailboxes")}</th>
               </tr>
             </thead>
             <tbody>
@@ -194,7 +163,7 @@ export function DashboardPage() {
               {customers.length === 0 && (
                 <tr>
                   <td colSpan={10} className="empty-row">
-                    No customers yet — click "Sync Now" to pull data from ION.
+                    {t("dashboard.table.empty")}
                   </td>
                 </tr>
               )}
