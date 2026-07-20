@@ -76,7 +76,7 @@ class LiveIonProvider:
             return datetime.fromisoformat(str(value).replace("Z", "+00:00")).date()
 
         billing = (raw.get("billingData") or [{}])[0]
-        total_cost = raw.get("customerCost")
+        total_cost = raw.get("cost")  # reseller cost (what TD SYNNEX charges us), not customerCost
         if total_cost in (None, 0):
             total_cost = billing.get("sellerCost", 0)
         quantity = int(raw.get("subscriptionTotalLicenses") or 0)
