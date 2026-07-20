@@ -1,9 +1,47 @@
+from collections import defaultdict
 from datetime import datetime
+from decimal import Decimal
 
 from sqlalchemy.orm import Session
 
 from app.models import Customer, LicenseLine, SyncLog
-from app.services.ion.base import IonApiError, IonProvider
+from app.services.ion.base import IonApiError, IonLicenseLineDTO, IonProvider
+
+
+def _consolidate_lines(lines: list[IonLicenseLineDTO]) -> list[IonLicenseLineDTO]:
+    """ION invoices each purchase batch of the same product as its own subscription
+    (e.g. 10 seats bought in 2022, 2 more in 2024), so a customer can have several
+    lines for the same SKU. Merge those into one line per (customer, sku), summing
+    quantities and computing a quantity-weighted average unit cost so total_cost
+    stays accurate."""
+    groups: dict[tuple[str, str], list[IonLicenseLineDTO]] = defaultdict(list)
+    for dto in lines:
+        groups[(dto.ion_customer_id, dto.sku)].append(dto)
+
+    consolidated = []
+    for (ion_customer_id, sku), group in groups.items():
+        total_quantity = sum(dto.quantity for dto in group)
+        total_cost = sum(dto.unit_cost * dto.quantity for dto in group)
+        weighted_unit_cost = total_cost / total_quantity if total_quantity else Decimal("0")
+        term_starts = [dto.term_start for dto in group if dto.term_start is not None]
+        term_ends = [dto.term_end for dto in group if dto.term_end is not None]
+        first = group[0]
+
+        consolidated.append(
+            IonLicenseLineDTO(
+                ion_line_id=f"consolidated:{ion_customer_id}:{sku}",
+                ion_customer_id=ion_customer_id,
+                sku=sku,
+                product_name=first.product_name,
+                vendor=first.vendor,
+                quantity=total_quantity,
+                unit_cost=weighted_unit_cost,
+                term_start=min(term_starts) if term_starts else None,
+                term_end=max(term_ends) if term_ends else None,
+                billing_period=first.billing_period,
+            )
+        )
+    return consolidated
 
 
 def sync_all(db: Session, provider: IonProvider) -> SyncLog:
@@ -25,7 +63,8 @@ def sync_all(db: Session, provider: IonProvider) -> SyncLog:
             db.flush()
             customer_id_by_ion_id[dto.ion_customer_id] = customer.id
 
-        lines = [dto for dto in provider.get_license_lines() if dto.unit_cost != 0 and dto.quantity != 0]
+        raw_lines = [dto for dto in provider.get_license_lines() if dto.unit_cost != 0 and dto.quantity != 0]
+        lines = _consolidate_lines(raw_lines)
         seen_ion_line_ids = set()
         for dto in lines:
             customer_id = customer_id_by_ion_id.get(dto.ion_customer_id)
