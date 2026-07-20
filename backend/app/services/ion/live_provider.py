@@ -80,11 +80,17 @@ class LiveIonProvider:
             return datetime.fromisoformat(str(value).replace("Z", "+00:00")).date()
 
         billing = (raw.get("billingData") or [{}])[0]
-        total_cost = raw.get("cost")  # reseller cost (what TD SYNNEX charges us), not customerCost
-        if total_cost in (None, 0):
-            total_cost = billing.get("sellerCost", 0)
         quantity = int(raw.get("subscriptionTotalLicenses") or 0)
-        unit_cost = (total_cost or 0) / quantity if quantity else (total_cost or 0)
+
+        # `cost` (reseller cost) is already per-license - unlike `sellerCost` in
+        # billingData, which is the total across all licenses on the subscription
+        # and must be divided by quantity to get a per-license figure.
+        per_license_cost = raw.get("cost")
+        if per_license_cost in (None, 0):
+            total_cost = billing.get("sellerCost", 0)
+            unit_cost = (total_cost or 0) / quantity if quantity else (total_cost or 0)
+        else:
+            unit_cost = per_license_cost
 
         return IonLicenseLineDTO(
             ion_line_id=str(raw.get("id") or raw.get("subscriptionId")),
