@@ -55,7 +55,11 @@ class LiveIonProvider:
             offset += len(batch)
             if not batch or offset >= total:
                 break
-        return [self._map_line(item) for item in results]
+        # Cancelled/superseded subscriptions ("deleted") can still carry a residual
+        # `cost` value with no customerCost/billingData - only "active" ones are
+        # real, current licenses.
+        active = [item for item in results if item.get("subscriptionStatus") == "active"]
+        return [self._map_line(item) for item in active]
 
     # -- internals -----------------------------------------------------
 
