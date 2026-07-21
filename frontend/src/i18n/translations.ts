@@ -47,7 +47,7 @@ export const translations = {
     "dashboard.coverage.subtitle": "Share of NinjaOne devices with SentinelOne, by customer",
     "dashboard.coverage.empty": "No NinjaOne device data yet.",
     "dashboard.table.customer": "Customer",
-    "dashboard.table.lines": "# Lines",
+    "dashboard.table.lines": "# Products",
     "dashboard.table.empty": 'No customers yet — click "Sync Now" to pull data from ION.',
 
     "customerDetail.backedUpMachines": "Backed-up machines",
@@ -128,7 +128,7 @@ export const translations = {
     "dashboard.coverage.subtitle": "Percentuale di device NinjaOne con SentinelOne, per cliente",
     "dashboard.coverage.empty": "Nessun dato sui device NinjaOne disponibile.",
     "dashboard.table.customer": "Cliente",
-    "dashboard.table.lines": "# Righe",
+    "dashboard.table.lines": "# Prodotti",
     "dashboard.table.empty": 'Nessun cliente ancora — clicca "Sincronizza ora" per importare i dati da ION.',
 
     "customerDetail.backedUpMachines": "Macchine protette",

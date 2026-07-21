@@ -63,7 +63,10 @@ def sync_all(db: Session, provider: IonProvider) -> SyncLog:
             db.flush()
             customer_id_by_ion_id[dto.ion_customer_id] = customer.id
 
-        raw_lines = [dto for dto in provider.get_license_lines() if dto.unit_cost != 0 and dto.quantity != 0]
+        raw_lines = [
+            dto for dto in provider.get_license_lines()
+            if dto.unit_cost != 0 and dto.quantity != 0 and dto.billing_period != "one_time"
+        ]
         lines = _consolidate_lines(raw_lines)
         seen_ion_line_ids = set()
         for dto in lines:
