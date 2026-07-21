@@ -49,6 +49,7 @@ export const translations = {
     "dashboard.table.customer": "Customer",
     "dashboard.table.lines": "# Products",
     "dashboard.table.empty": 'No customers yet — click "Sync Now" to pull data from ION.',
+    "dashboard.table.ninjaOnlyTooltip": "Not present in StreamOne/ION — no billing details available",
 
     "customerDetail.backedUpMachines": "Backed-up machines",
     "customerDetail.backedUpMailboxes": "Backed-up mailboxes",
@@ -68,6 +69,7 @@ export const translations = {
     "ninjaMapping.title": "Map NinjaOne organizations",
     "ninjaMapping.table.org": "NinjaOne organization",
     "ninjaMapping.empty": "No unmapped organizations — everything is matched.",
+    "ninjaMapping.noIonCustomer": "No StreamOne customer",
 
     "acronisMapping.title": "Map Acronis tenants",
     "acronisMapping.table.tenant": "Acronis tenant",
@@ -130,6 +132,7 @@ export const translations = {
     "dashboard.table.customer": "Cliente",
     "dashboard.table.lines": "# Prodotti",
     "dashboard.table.empty": 'Nessun cliente ancora — clicca "Sincronizza ora" per importare i dati da ION.',
+    "dashboard.table.ninjaOnlyTooltip": "Non presente su StreamOne/ION — nessun dettaglio di fatturazione disponibile",
 
     "customerDetail.backedUpMachines": "Macchine protette",
     "customerDetail.backedUpMailboxes": "Caselle protette",
@@ -149,6 +152,7 @@ export const translations = {
     "ninjaMapping.title": "Mappa organizzazioni NinjaOne",
     "ninjaMapping.table.org": "Organizzazione NinjaOne",
     "ninjaMapping.empty": "Nessuna organizzazione da mappare — tutto è già associato.",
+    "ninjaMapping.noIonCustomer": "Nessun cliente su StreamOne",
 
     "acronisMapping.title": "Mappa tenant Acronis",
     "acronisMapping.table.tenant": "Tenant Acronis",

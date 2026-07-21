@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getCustomers } from "../api/customers";
-import { getUnmappedTenants, saveTenantMapping } from "../api/acronis";
+import { createStandaloneCustomer, getUnmappedTenants, saveTenantMapping } from "../api/acronis";
 import { AppShell } from "../components/AppShell";
 import { BytesCell } from "../components/BytesCell";
 import { SkeletonTable } from "../components/Skeleton";
@@ -36,6 +36,19 @@ function MappingRow({
     }
   }
 
+  async function saveStandalone() {
+    setSaving(true);
+    setError(null);
+    try {
+      await createStandaloneCustomer(tenant.tenant_id);
+      onMapped(tenant.tenant_id);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t("common.failedToSaveMapping"));
+    } finally {
+      setSaving(false);
+    }
+  }
+
   return (
     <tr>
       <td>{tenant.tenant_name}</td>
@@ -55,6 +68,9 @@ function MappingRow({
       <td>
         <button onClick={save} disabled={saving || !customerId}>
           {saving ? t("common.saving") : t("common.save")}
+        </button>{" "}
+        <button onClick={saveStandalone} disabled={saving}>
+          {t("ninjaMapping.noIonCustomer")}
         </button>
         {error && <span className="error-text small">{error}</span>}
       </td>

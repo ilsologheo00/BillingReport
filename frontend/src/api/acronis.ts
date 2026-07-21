@@ -19,3 +19,10 @@ export function saveTenantMapping(tenantId: string, customerId: number): Promise
     body: JSON.stringify({ tenant_id: tenantId, customer_id: customerId }),
   });
 }
+
+export function createStandaloneCustomer(tenantId: string): Promise<AcronisOrgStat> {
+  return apiFetch<AcronisOrgStat>("/api/acronis/mapping/standalone", {
+    method: "POST",
+    body: JSON.stringify({ tenant_id: tenantId }),
+  });
+}

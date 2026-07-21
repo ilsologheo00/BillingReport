@@ -93,6 +93,28 @@ def acronis_sync_all(db: Session, provider: AcronisProvider) -> AcronisSyncLog:
     return log
 
 
+def create_standalone_customer_for_tenant(db: Session, tenant_id: str) -> AcronisOrgStat:
+    """For an Acronis tenant with no StreamOne/ION counterpart: create a customer
+    row with no ion_customer_id, so it can still be listed (with its backup
+    stats) instead of sitting hidden in the unmapped-tenants list forever."""
+    row = db.query(AcronisOrgStat).filter(AcronisOrgStat.tenant_id == tenant_id).first()
+    if row is None:
+        raise ValueError(f"Unknown Acronis tenant: {tenant_id}")
+    if row.customer_id is not None:
+        raise ValueError(f"Acronis tenant already mapped: {tenant_id}")
+
+    customer = Customer(ion_customer_id=None, name=row.tenant_name)
+    db.add(customer)
+    db.flush()
+
+    row.customer_id = customer.id
+    _apply_stats_to_customer(customer, row)
+
+    db.commit()
+    db.refresh(row)
+    return row
+
+
 def get_unmapped_tenants(db: Session) -> list[AcronisOrgStat]:
     return db.query(AcronisOrgStat).filter(AcronisOrgStat.customer_id.is_(None)).order_by(AcronisOrgStat.tenant_name).all()
 

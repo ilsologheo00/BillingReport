@@ -88,6 +88,33 @@ def get_unmapped_orgs(db: Session) -> list[NinjaOrgStat]:
     return db.query(NinjaOrgStat).filter(NinjaOrgStat.customer_id.is_(None)).order_by(NinjaOrgStat.org_name).all()
 
 
+def create_standalone_customer_for_org(db: Session, org_name: str) -> NinjaOrgStat:
+    """For a NinjaOne org with no StreamOne/ION counterpart: create a customer
+    row with no ion_customer_id, so it can still be listed (with its NinjaOne
+    stats) instead of sitting hidden in the unmapped-orgs list forever."""
+    row = db.query(NinjaOrgStat).filter(NinjaOrgStat.org_name == org_name).first()
+    if row is None:
+        raise ValueError(f"Unknown NinjaOne organization: {org_name}")
+    if row.customer_id is not None:
+        raise ValueError(f"NinjaOne organization already mapped: {org_name}")
+
+    customer = Customer(
+        ion_customer_id=None,
+        name=row.org_name,
+        ninja_org_name=row.org_name,
+        device_count=row.device_count,
+        sentinelone_count=row.sentinelone_count,
+        ninja_synced_at=datetime.utcnow(),
+    )
+    db.add(customer)
+    db.flush()
+
+    row.customer_id = customer.id
+    db.commit()
+    db.refresh(row)
+    return row
+
+
 def set_org_mapping(db: Session, org_name: str, customer_id: int | None) -> NinjaOrgStat:
     row = db.query(NinjaOrgStat).filter(NinjaOrgStat.org_name == org_name).first()
     if row is None:

@@ -29,7 +29,9 @@ class Customer(Base):
     __tablename__ = "customers"
 
     id = Column(Integer, primary_key=True)
-    ion_customer_id = Column(String, unique=True, nullable=False, index=True)
+    # Nullable: customers seen only in NinjaOne (no StreamOne/ION counterpart) are
+    # kept as standalone rows with ion_customer_id=None - see create_standalone_customer_for_org.
+    ion_customer_id = Column(String, unique=True, nullable=True, index=True)
     name = Column(String, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

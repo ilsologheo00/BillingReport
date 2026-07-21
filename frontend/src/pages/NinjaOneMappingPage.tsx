@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getCustomers } from "../api/customers";
-import { getUnmappedOrgs, saveOrgMapping } from "../api/ninjaone";
+import { createStandaloneCustomer, getUnmappedOrgs, saveOrgMapping } from "../api/ninjaone";
 import { AppShell } from "../components/AppShell";
 import { SkeletonTable } from "../components/Skeleton";
 import { useLanguage } from "../i18n/LanguageContext";
@@ -35,6 +35,19 @@ function MappingRow({
     }
   }
 
+  async function saveStandalone() {
+    setSaving(true);
+    setError(null);
+    try {
+      await createStandaloneCustomer(org.org_name);
+      onMapped(org.org_name);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t("common.failedToSaveMapping"));
+    } finally {
+      setSaving(false);
+    }
+  }
+
   return (
     <tr>
       <td>{org.org_name}</td>
@@ -53,6 +66,9 @@ function MappingRow({
       <td>
         <button onClick={save} disabled={saving || !customerId}>
           {saving ? t("common.saving") : t("common.save")}
+        </button>{" "}
+        <button onClick={saveStandalone} disabled={saving}>
+          {t("ninjaMapping.noIonCustomer")}
         </button>
         {error && <span className="error-text small">{error}</span>}
       </td>

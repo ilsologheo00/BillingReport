@@ -21,7 +21,7 @@ export interface NinjaSyncLog {
 export interface CustomerSummary {
   id: number;
   name: string;
-  ion_customer_id: string;
+  ion_customer_id: string | null;
   total_cost: string;
   total_price: string | null;
   total_margin: string | null;
@@ -59,7 +59,7 @@ export interface LicenseLine {
 export interface CustomerDetail {
   id: number;
   name: string;
-  ion_customer_id: string;
+  ion_customer_id: string | null;
   license_lines: LicenseLine[];
   total_cost: string;
   total_price: string | null;

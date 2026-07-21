@@ -3,11 +3,16 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models import NinjaSyncLog, User
-from app.schemas import NinjaOrgMappingUpsert, NinjaOrgStatOut, NinjaSyncLogResponse
+from app.schemas import NinjaOrgMappingUpsert, NinjaOrgStandaloneCreate, NinjaOrgStatOut, NinjaSyncLogResponse
 from app.security import get_current_user
 from app.services.ninjaone.base import NinjaOneProvider
 from app.services.ninjaone.factory import get_ninjaone_provider
-from app.services.ninjaone_sync_service import get_unmapped_orgs, ninjaone_sync_all, set_org_mapping
+from app.services.ninjaone_sync_service import (
+    create_standalone_customer_for_org,
+    get_unmapped_orgs,
+    ninjaone_sync_all,
+    set_org_mapping,
+)
 
 router = APIRouter(prefix="/api/ninjaone", tags=["ninjaone"])
 
@@ -45,5 +50,17 @@ def upsert_org_mapping(
 ):
     try:
         return set_org_mapping(db, payload.org_name, payload.customer_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@router.post("/mapping/standalone", response_model=NinjaOrgStatOut)
+def create_standalone_customer(
+    payload: NinjaOrgStandaloneCreate,
+    db: Session = Depends(get_db),
+    _user: User = Depends(get_current_user),
+):
+    try:
+        return create_standalone_customer_for_org(db, payload.org_name)
     except ValueError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc

@@ -19,3 +19,10 @@ export function saveOrgMapping(orgName: string, customerId: number): Promise<Nin
     body: JSON.stringify({ org_name: orgName, customer_id: customerId }),
   });
 }
+
+export function createStandaloneCustomer(orgName: string): Promise<NinjaOrgStat> {
+  return apiFetch<NinjaOrgStat>("/api/ninjaone/mapping/standalone", {
+    method: "POST",
+    body: JSON.stringify({ org_name: orgName }),
+  });
+}

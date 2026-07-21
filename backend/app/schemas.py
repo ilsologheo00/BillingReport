@@ -63,7 +63,7 @@ class LicenseLineOut(BaseModel):
 class CustomerSummaryOut(BaseModel):
     id: int
     name: str
-    ion_customer_id: str
+    ion_customer_id: Optional[str] = None
     total_cost: Decimal
     total_price: Optional[Decimal] = None
     total_margin: Optional[Decimal] = None
@@ -82,7 +82,7 @@ class CustomerSummaryOut(BaseModel):
 class CustomerDetailOut(BaseModel):
     id: int
     name: str
-    ion_customer_id: str
+    ion_customer_id: Optional[str] = None
     license_lines: list[LicenseLineOut]
     total_cost: Decimal
     total_price: Optional[Decimal] = None
@@ -127,6 +127,10 @@ class NinjaOrgMappingUpsert(BaseModel):
     customer_id: int
 
 
+class NinjaOrgStandaloneCreate(BaseModel):
+    org_name: str
+
+
 class AcronisSyncLogResponse(BaseModel):
     id: int
     started_at: datetime
@@ -156,3 +160,7 @@ class AcronisOrgStatOut(BaseModel):
 class AcronisTenantMappingUpsert(BaseModel):
     tenant_id: str
     customer_id: int
+
+
+class AcronisTenantStandaloneCreate(BaseModel):
+    tenant_id: str
