@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.models import AcronisOrgStat, AcronisSyncLog, Customer
 from app.services.acronis.base import AcronisApiError, AcronisProvider
-from app.services.name_matching import normalize_name, unique_normalized_index
+from app.services.name_matching import find_by_name, normalize_name, unique_normalized_index
 
 
 def _apply_stats_to_customer(customer: Customer, row: AcronisOrgStat) -> None:
@@ -94,18 +94,23 @@ def acronis_sync_all(db: Session, provider: AcronisProvider) -> AcronisSyncLog:
 
 
 def create_standalone_customer_for_tenant(db: Session, tenant_id: str) -> AcronisOrgStat:
-    """For an Acronis tenant with no StreamOne/ION counterpart: create a customer
-    row with no ion_customer_id, so it can still be listed (with its backup
-    stats) instead of sitting hidden in the unmapped-tenants list forever."""
+    """For an Acronis tenant with no StreamOne/ION counterpart: attach it to a
+    customer with no ion_customer_id, so it can still be listed (with its
+    backup stats) instead of sitting hidden in the unmapped-tenants list
+    forever. If NinjaOne already created a standalone customer with a matching
+    name (the same real customer, mapped from the other integration first),
+    reuse that row instead of creating a duplicate."""
     row = db.query(AcronisOrgStat).filter(AcronisOrgStat.tenant_id == tenant_id).first()
     if row is None:
         raise ValueError(f"Unknown Acronis tenant: {tenant_id}")
     if row.customer_id is not None:
         raise ValueError(f"Acronis tenant already mapped: {tenant_id}")
 
-    customer = Customer(ion_customer_id=None, name=row.tenant_name)
-    db.add(customer)
-    db.flush()
+    customer = find_by_name(db.query(Customer).all(), lambda c: c.name, row.tenant_name)
+    if customer is None:
+        customer = Customer(ion_customer_id=None, name=row.tenant_name)
+        db.add(customer)
+        db.flush()
 
     row.customer_id = customer.id
     _apply_stats_to_customer(customer, row)

@@ -29,3 +29,14 @@ def unique_normalized_index(items: list[T], name_of: "callable[[T], str]") -> di
     for item in items:
         groups[normalize_name(name_of(item))].append(item)
     return {k: v[0] for k, v in groups.items() if len(v) == 1}
+
+
+def find_by_name(items: list[T], name_of: "callable[[T], str]", name: str) -> T | None:
+    """Exact (case-insensitive) match first, falling back to a unique
+    normalized match. Same precedence the sync services use to match
+    NinjaOne/Acronis entries to a customer by name."""
+    exact = {name_of(item).strip().lower(): item for item in items}
+    match = exact.get(name.strip().lower())
+    if match is not None:
+        return match
+    return unique_normalized_index(items, name_of).get(normalize_name(name))
