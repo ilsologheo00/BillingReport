@@ -115,7 +115,7 @@ export const translations = {
     "common.customers": "Clienti",
     "common.totalCost": "Costo totale",
     "common.totalPrice": "Prezzo totale",
-    "common.margin": "Margine",
+    "common.margin": "Margine Techdata",
     "common.devices": "Device",
     "common.sentinelone": "SentinelOne",
     "common.backupUsedTotal": "Backup usato / totale",
