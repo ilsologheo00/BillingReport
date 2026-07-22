@@ -3,8 +3,9 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models import Customer, LicenseLine, SellPrice, User
-from app.schemas import CustomerDetailOut, CustomerSummaryOut, LicenseLineOut
+from app.schemas import CustomerDetailOut, CustomerMergeRequest, CustomerSummaryOut, LicenseLineOut
 from app.security import get_current_user
+from app.services.customer_merge_service import merge_customers
 from app.services.margin_service import aggregate_totals, exchange_online_licenses, is_customer_empty, line_margin, sell_price_lookup
 
 router = APIRouter(prefix="/api/customers", tags=["customers"])
@@ -50,8 +51,7 @@ def list_customers(db: Session = Depends(get_db), _user: User = Depends(get_curr
     return results
 
 
-@router.get("/{customer_id}", response_model=CustomerDetailOut)
-def get_customer(customer_id: int, db: Session = Depends(get_db), _user: User = Depends(get_current_user)):
+def _customer_detail(db: Session, customer_id: int) -> CustomerDetailOut:
     customer = db.query(Customer).filter(Customer.id == customer_id).first()
     if customer is None:
         raise HTTPException(status_code=404, detail="Customer not found")
@@ -100,3 +100,21 @@ def get_customer(customer_id: int, db: Session = Depends(get_db), _user: User = 
         backup_mailboxes_count=customer.backup_mailboxes_count,
         exchange_online_licenses=exchange_online_licenses(customer),
     )
+
+
+@router.get("/{customer_id}", response_model=CustomerDetailOut)
+def get_customer(customer_id: int, db: Session = Depends(get_db), _user: User = Depends(get_current_user)):
+    return _customer_detail(db, customer_id)
+
+
+@router.post("/merge", response_model=CustomerDetailOut)
+def merge_customer(
+    payload: CustomerMergeRequest,
+    db: Session = Depends(get_db),
+    _user: User = Depends(get_current_user),
+):
+    try:
+        merge_customers(db, payload.keep_customer_id, payload.merge_customer_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    return _customer_detail(db, payload.keep_customer_id)

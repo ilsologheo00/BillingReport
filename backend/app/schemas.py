@@ -112,6 +112,11 @@ class SellPriceUpsert(BaseModel):
     unit_price: Decimal
 
 
+class CustomerMergeRequest(BaseModel):
+    keep_customer_id: int
+    merge_customer_id: int
+
+
 class NinjaOrgStatOut(BaseModel):
     org_name: str
     device_count: int

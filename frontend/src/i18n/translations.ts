@@ -65,6 +65,11 @@ export const translations = {
     "customerDetail.failedToSave": "Failed to save",
     "customerDetail.setPricePlaceholder": "Set price",
     "customerDetail.failedToLoadCustomer": "Failed to load customer",
+    "customerDetail.merge.label": "Duplicate of another customer?",
+    "customerDetail.merge.select": "Merge with…",
+    "customerDetail.merge.button": "Merge",
+    "customerDetail.merge.merging": "Merging…",
+    "customerDetail.merge.confirm": "Merge \"{name}\" into this customer? All its NinjaOne/Acronis data, license lines and prices will move here, and \"{name}\" will be deleted. This cannot be undone.",
 
     "ninjaMapping.title": "Map NinjaOne organizations",
     "ninjaMapping.table.org": "NinjaOne organization",
@@ -148,6 +153,11 @@ export const translations = {
     "customerDetail.failedToSave": "Salvataggio non riuscito",
     "customerDetail.setPricePlaceholder": "Imposta prezzo",
     "customerDetail.failedToLoadCustomer": "Impossibile caricare il cliente",
+    "customerDetail.merge.label": "Duplicato di un altro cliente?",
+    "customerDetail.merge.select": "Unisci con…",
+    "customerDetail.merge.button": "Unisci",
+    "customerDetail.merge.merging": "Unione in corso…",
+    "customerDetail.merge.confirm": "Unire \"{name}\" a questo cliente? Tutti i suoi dati NinjaOne/Acronis, le righe di licenza e i prezzi verranno spostati qui, e \"{name}\" verrà eliminato. L'operazione non è reversibile.",
 
     "ninjaMapping.title": "Mappa organizzazioni NinjaOne",
     "ninjaMapping.table.org": "Organizzazione NinjaOne",

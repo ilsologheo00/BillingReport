@@ -12,3 +12,10 @@ export function getCustomer(id: number): Promise<CustomerDetail> {
 export function getReportSummary(): Promise<ReportSummary> {
   return apiFetch<ReportSummary>("/api/report/summary");
 }
+
+export function mergeCustomers(keepCustomerId: number, mergeCustomerId: number): Promise<CustomerDetail> {
+  return apiFetch<CustomerDetail>("/api/customers/merge", {
+    method: "POST",
+    body: JSON.stringify({ keep_customer_id: keepCustomerId, merge_customer_id: mergeCustomerId }),
+  });
+}

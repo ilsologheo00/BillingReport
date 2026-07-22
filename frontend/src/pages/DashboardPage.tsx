@@ -138,11 +138,9 @@ export function DashboardPage() {
               {customers.map((c) => (
                 <tr key={c.id}>
                   <td>
-                    {c.ion_customer_id ? (
-                      <Link to={`/customers/${c.id}`}>{c.name}</Link>
-                    ) : (
-                      <span title={t("dashboard.table.ninjaOnlyTooltip")}>{c.name}</span>
-                    )}
+                    <Link to={`/customers/${c.id}`} title={!c.ion_customer_id ? t("dashboard.table.ninjaOnlyTooltip") : undefined}>
+                      {c.name}
+                    </Link>
                   </td>
                   <td>{c.line_count}</td>
                   <td><MoneyCell value={c.total_cost} /></td>

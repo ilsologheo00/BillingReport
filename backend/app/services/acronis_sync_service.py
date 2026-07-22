@@ -7,7 +7,7 @@ from app.services.acronis.base import AcronisApiError, AcronisProvider
 from app.services.name_matching import find_by_name, normalize_name, unique_normalized_index
 
 
-def _apply_stats_to_customer(customer: Customer, row: AcronisOrgStat) -> None:
+def apply_acronis_stats_to_customer(customer: Customer, row: AcronisOrgStat) -> None:
     customer.acronis_tenant_name = row.tenant_name
     customer.backup_total_bytes = row.backup_total_bytes
     customer.backup_used_bytes = row.backup_used_bytes
@@ -69,7 +69,7 @@ def acronis_sync_all(db: Session, provider: AcronisProvider) -> AcronisSyncLog:
                 unmatched += 1
                 continue
 
-            _apply_stats_to_customer(customer, row)
+            apply_acronis_stats_to_customer(customer, row)
             matched += 1
 
         log.status = "success"
@@ -113,7 +113,7 @@ def create_standalone_customer_for_tenant(db: Session, tenant_id: str) -> Acroni
         db.flush()
 
     row.customer_id = customer.id
-    _apply_stats_to_customer(customer, row)
+    apply_acronis_stats_to_customer(customer, row)
 
     db.commit()
     db.refresh(row)
@@ -134,7 +134,7 @@ def set_tenant_mapping(db: Session, tenant_id: str, customer_id: int) -> Acronis
         raise ValueError(f"Unknown customer id: {customer_id}")
 
     row.customer_id = customer_id
-    _apply_stats_to_customer(customer, row)
+    apply_acronis_stats_to_customer(customer, row)
 
     db.commit()
     db.refresh(row)

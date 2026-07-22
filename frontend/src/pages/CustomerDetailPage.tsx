@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { getCustomer } from "../api/customers";
+import { getCustomer, getCustomers, mergeCustomers } from "../api/customers";
 import { updatePrice } from "../api/prices";
 import { AppShell } from "../components/AppShell";
 import { MoneyCell } from "../components/MoneyCell";
@@ -9,7 +9,60 @@ import { MailboxCoverageCell } from "../components/MailboxCoverageCell";
 import { MarginBadge } from "../components/MarginBadge";
 import { SkeletonStatBar, SkeletonTable } from "../components/Skeleton";
 import { useLanguage } from "../i18n/LanguageContext";
-import type { CustomerDetail, LicenseLine } from "../api/types";
+import type { CustomerDetail, CustomerSummary, LicenseLine } from "../api/types";
+
+function MergeControl({ customer, onMerged }: { customer: CustomerDetail; onMerged: () => void }) {
+  const { t } = useLanguage();
+  const [candidates, setCandidates] = useState<CustomerSummary[]>([]);
+  const [otherId, setOtherId] = useState("");
+  const [merging, setMerging] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    getCustomers()
+      .then((all) => setCandidates(all.filter((c) => c.id !== customer.id)))
+      .catch(() => {});
+  }, [customer.id]);
+
+  async function merge() {
+    if (!otherId) return;
+    const other = candidates.find((c) => String(c.id) === otherId);
+    if (!other) return;
+    if (!window.confirm(t("customerDetail.merge.confirm", { name: other.name }))) return;
+
+    setMerging(true);
+    setError(null);
+    try {
+      await mergeCustomers(customer.id, Number(otherId));
+      setOtherId("");
+      onMerged();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t("customerDetail.failedToSave"));
+    } finally {
+      setMerging(false);
+    }
+  }
+
+  if (candidates.length === 0) return null;
+
+  return (
+    <div className="merge-control">
+      <span>{t("customerDetail.merge.label")}</span>
+      <select value={otherId} onChange={(e) => setOtherId(e.target.value)} disabled={merging}>
+        <option value="">{t("customerDetail.merge.select")}</option>
+        {candidates.map((c) => (
+          <option key={c.id} value={c.id}>
+            {c.name}
+          </option>
+        ))}
+      </select>
+      <button onClick={merge} disabled={merging || !otherId}>
+        {merging ? t("customerDetail.merge.merging") : t("customerDetail.merge.button")}
+      </button>
+      {error && <span className="error-text small">{error}</span>}
+    </div>
+  );
+}
 
 function PriceCell({ customerId, line, onUpdated }: { customerId: number; line: LicenseLine; onUpdated: () => void }) {
   const { t } = useLanguage();
@@ -92,6 +145,7 @@ export function CustomerDetailPage() {
             </Link>
             <h1>{customer?.name ?? t("common.loading")}</h1>
           </div>
+          {customer && <MergeControl customer={customer} onMerged={refresh} />}
         </header>
 
         {!customer ? (
