@@ -52,6 +52,10 @@ export const translations = {
     "dashboard.table.empty": 'No customers yet — click "Sync Now" to pull data from ION.',
     "dashboard.table.ninjaOnlyTooltip": "Not present in StreamOne/ION — no billing details available",
 
+    "customerDetail.ninjaone.title": "NinjaOne",
+    "customerDetail.sentinelone.title": "SentinelOne",
+    "customerDetail.sentinelone.protected": "Protected",
+    "customerDetail.acronis.title": "Acronis",
     "customerDetail.backedUpMachines": "Backed-up machines",
     "customerDetail.backedUpMailboxes": "Backed-up mailboxes",
     "customerDetail.table.product": "Product",
@@ -141,6 +145,10 @@ export const translations = {
     "dashboard.table.empty": 'Nessun cliente ancora — clicca "Sincronizza ora" per importare i dati da ION.',
     "dashboard.table.ninjaOnlyTooltip": "Non presente su StreamOne/ION — nessun dettaglio di fatturazione disponibile",
 
+    "customerDetail.ninjaone.title": "NinjaOne",
+    "customerDetail.sentinelone.title": "SentinelOne",
+    "customerDetail.sentinelone.protected": "Protetti",
+    "customerDetail.acronis.title": "Acronis",
     "customerDetail.backedUpMachines": "Macchine protette",
     "customerDetail.backedUpMailboxes": "Caselle protette",
     "customerDetail.table.product": "Prodotto",

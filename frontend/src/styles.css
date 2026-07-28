@@ -488,6 +488,14 @@ button:disabled {
   color: var(--text-muted);
 }
 
+.card-stat {
+  margin-top: 14px;
+}
+
+.card-stat:first-of-type {
+  margin-top: 10px;
+}
+
 /* -- Bar chart / meter -------------------------------------------------------- */
 
 .bar-chart {

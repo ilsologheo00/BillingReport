@@ -170,39 +170,55 @@ export function CustomerDetailPage() {
                   <MarginBadge margin={customer.total_margin} marginPct={customer.margin_pct} />
                 </span>
               </div>
-              <div>
-                <span className="summary-label">{t("common.devices")}</span>
-                <span className="summary-value">{customer.device_count ?? "—"}</span>
+            </div>
+
+            <div className="charts-grid">
+              <div className="chart-card">
+                <h2>{t("customerDetail.ninjaone.title")}</h2>
+                <div className="card-stat">
+                  <span className="summary-label">{t("common.devices")}</span>
+                  <span className="summary-value">{customer.device_count ?? "—"}</span>
+                </div>
               </div>
-              <div>
-                <span className="summary-label">{t("common.sentinelone")}</span>
-                <span className="summary-value">{customer.sentinelone_count ?? "—"}</span>
+
+              <div className="chart-card">
+                <h2>{t("customerDetail.sentinelone.title")}</h2>
+                <div className="card-stat">
+                  <span className="summary-label">{t("customerDetail.sentinelone.protected")}</span>
+                  <span className="summary-value">
+                    {customer.sentinelone_count ?? "—"}{customer.device_count ? ` / ${customer.device_count}` : ""}
+                  </span>
+                </div>
               </div>
-              <div>
-                <span className="summary-label">{t("common.backupUsedTotal")}</span>
-                <span className="summary-value">
-                  {customer.backup_used_bytes !== null ? (
-                    <>
-                      <BytesCell value={customer.backup_used_bytes} /> / <BytesCell value={customer.backup_total_bytes} />
-                    </>
-                  ) : (
-                    "—"
-                  )}
-                </span>
-              </div>
-              <div>
-                <span className="summary-label">{t("common.backupAvailable")}</span>
-                <span className="summary-value"><BytesCell value={customer.backup_available_bytes} /></span>
-              </div>
-              <div>
-                <span className="summary-label">{t("customerDetail.backedUpMachines")}</span>
-                <span className="summary-value">{customer.backup_machines_count ?? "—"}</span>
-              </div>
-              <div>
-                <span className="summary-label">{t("customerDetail.backedUpMailboxes")}</span>
-                <span className="summary-value">
-                  <MailboxCoverageCell backedUp={customer.backup_mailboxes_count} licensed={customer.exchange_online_licenses} />
-                </span>
+
+              <div className="chart-card">
+                <h2>{t("customerDetail.acronis.title")}</h2>
+                <div className="card-stat">
+                  <span className="summary-label">{t("common.backupUsedTotal")}</span>
+                  <span className="summary-value">
+                    {customer.backup_used_bytes !== null ? (
+                      <>
+                        <BytesCell value={customer.backup_used_bytes} /> / <BytesCell value={customer.backup_total_bytes} />
+                      </>
+                    ) : (
+                      "—"
+                    )}
+                  </span>
+                </div>
+                <div className="card-stat">
+                  <span className="summary-label">{t("common.backupAvailable")}</span>
+                  <span className="summary-value"><BytesCell value={customer.backup_available_bytes} /></span>
+                </div>
+                <div className="card-stat">
+                  <span className="summary-label">{t("customerDetail.backedUpMachines")}</span>
+                  <span className="summary-value">{customer.backup_machines_count ?? "—"}</span>
+                </div>
+                <div className="card-stat">
+                  <span className="summary-label">{t("customerDetail.backedUpMailboxes")}</span>
+                  <span className="summary-value">
+                    <MailboxCoverageCell backedUp={customer.backup_mailboxes_count} licensed={customer.exchange_online_licenses} />
+                  </span>
+                </div>
               </div>
             </div>
 
