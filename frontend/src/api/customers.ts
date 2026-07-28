@@ -19,3 +19,10 @@ export function mergeCustomers(keepCustomerId: number, mergeCustomerId: number):
     body: JSON.stringify({ keep_customer_id: keepCustomerId, merge_customer_id: mergeCustomerId }),
   });
 }
+
+export function setConsolidation(customerId: number, consolidate: boolean): Promise<CustomerDetail> {
+  return apiFetch<CustomerDetail>(`/api/customers/${customerId}/consolidation`, {
+    method: "PUT",
+    body: JSON.stringify({ consolidate }),
+  });
+}

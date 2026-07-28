@@ -55,6 +55,7 @@ export interface LicenseLine {
   term_end: string | null;
   billing_period: string | null;
   last_synced_at: string;
+  po_name: string | null;
 }
 
 export interface CustomerDetail {
@@ -75,6 +76,7 @@ export interface CustomerDetail {
   backup_workstation_count: number | null;
   backup_vm_count: number | null;
   backup_mailboxes_count: number | null;
+  consolidate_license_lines: boolean;
 }
 
 export interface ReportSummary {

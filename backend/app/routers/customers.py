@@ -2,11 +2,23 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models import Customer, LicenseLine, SellPrice, User
-from app.schemas import CustomerDetailOut, CustomerMergeRequest, CustomerSummaryOut, LicenseLineOut
+from app.models import Customer, LicenseLine, PurchaseOrder, SellPrice, User
+from app.schemas import (
+    CustomerConsolidationUpdate,
+    CustomerDetailOut,
+    CustomerMergeRequest,
+    CustomerSummaryOut,
+    LicenseLineOut,
+)
 from app.security import get_current_user
 from app.services.customer_merge_service import merge_customers
-from app.services.margin_service import aggregate_totals, is_customer_empty, line_margin, sell_price_lookup
+from app.services.margin_service import (
+    aggregate_totals,
+    is_customer_empty,
+    line_margin,
+    purchase_order_lookup,
+    sell_price_lookup,
+)
 
 router = APIRouter(prefix="/api/customers", tags=["customers"])
 
@@ -58,6 +70,9 @@ def _customer_detail(db: Session, customer_id: int) -> CustomerDetailOut:
         raise HTTPException(status_code=404, detail="Customer not found")
 
     prices = sell_price_lookup(db.query(SellPrice).filter(SellPrice.customer_id == customer_id).all())
+    purchase_orders = purchase_order_lookup(
+        db.query(PurchaseOrder).join(LicenseLine).filter(LicenseLine.customer_id == customer_id).all()
+    )
     margins = [line_margin(line, prices.get((customer_id, line.sku))) for line in customer.license_lines]
     totals = aggregate_totals(margins)
 
@@ -79,6 +94,7 @@ def _customer_detail(db: Session, customer_id: int) -> CustomerDetailOut:
             term_end=lm.line.term_end,
             billing_period=lm.line.billing_period,
             last_synced_at=lm.line.last_synced_at,
+            po_name=(po.po_name if (po := purchase_orders.get(lm.line.id)) else None),
         )
         for lm in margins
     ]
@@ -101,6 +117,7 @@ def _customer_detail(db: Session, customer_id: int) -> CustomerDetailOut:
         backup_workstation_count=customer.backup_workstation_count,
         backup_vm_count=customer.backup_vm_count,
         backup_mailboxes_count=customer.backup_mailboxes_count,
+        consolidate_license_lines=customer.consolidate_license_lines is not False,
     )
 
 
@@ -120,3 +137,18 @@ def merge_customer(
     except ValueError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     return _customer_detail(db, payload.keep_customer_id)
+
+
+@router.put("/{customer_id}/consolidation", response_model=CustomerDetailOut)
+def set_consolidation(
+    customer_id: int,
+    payload: CustomerConsolidationUpdate,
+    db: Session = Depends(get_db),
+    _user: User = Depends(get_current_user),
+):
+    customer = db.query(Customer).filter(Customer.id == customer_id).first()
+    if customer is None:
+        raise HTTPException(status_code=404, detail="Customer not found")
+    customer.consolidate_license_lines = payload.consolidate
+    db.commit()
+    return _customer_detail(db, customer_id)

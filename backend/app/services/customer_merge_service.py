@@ -22,6 +22,8 @@ def merge_customers(db: Session, keep_customer_id: int, merge_customer_id: int) 
     if merge is None:
         raise ValueError(f"Unknown customer id: {merge_customer_id}")
 
+    # PurchaseOrder keys off license_line_id, not customer_id, so it travels
+    # automatically with the reassignment below - nothing to move by hand.
     db.query(LicenseLine).filter(LicenseLine.customer_id == merge_customer_id).update(
         {"customer_id": keep_customer_id}
     )

@@ -1,6 +1,7 @@
 from datetime import datetime, date
 
 from sqlalchemy import (
+    Boolean,
     Column,
     Integer,
     String,
@@ -35,6 +36,13 @@ class Customer(Base):
     name = Column(String, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Nullable, treated as True when unset: ION splits each purchase batch of the
+    # same product into its own subscription, which sync_service normally merges
+    # into one license_line per (customer, sku). Set to False to keep this
+    # customer's batches as separate lines instead - e.g. so each batch can carry
+    # its own PurchaseOrder note.
+    consolidate_license_lines = Column(Boolean, nullable=True)
 
     ninja_org_name = Column(String, nullable=True)
     device_count = Column(Integer, nullable=True)
@@ -72,6 +80,7 @@ class LicenseLine(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     customer = relationship("Customer", back_populates="license_lines")
+    purchase_order = relationship("PurchaseOrder", back_populates="license_line", uselist=False, cascade="all, delete-orphan")
 
 
 class SellPrice(Base):
@@ -85,6 +94,24 @@ class SellPrice(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     customer = relationship("Customer", back_populates="sell_prices")
+
+
+class PurchaseOrder(Base):
+    """Manually-entered PO reference per license line - StreamOne/ION does not
+    expose a purchase-order field on subscriptions or orders via the public API
+    (confirmed live), so this is tracked entirely within the app. Keyed by
+    license_line_id (not customer+sku) so that a customer with consolidation
+    disabled - see Customer.consolidate_license_lines - can carry a distinct PO
+    per purchase batch of the same product, not just one per SKU."""
+
+    __tablename__ = "purchase_orders"
+
+    id = Column(Integer, primary_key=True)
+    license_line_id = Column(Integer, ForeignKey("license_lines.id"), unique=True, nullable=False, index=True)
+    po_name = Column(String, nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    license_line = relationship("LicenseLine", back_populates="purchase_order")
 
 
 class SyncLog(Base):

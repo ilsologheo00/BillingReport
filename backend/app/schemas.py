@@ -58,6 +58,7 @@ class LicenseLineOut(BaseModel):
     term_end: Optional[date] = None
     billing_period: Optional[str] = None
     last_synced_at: datetime
+    po_name: Optional[str] = None
 
 
 class CustomerSummaryOut(BaseModel):
@@ -98,6 +99,7 @@ class CustomerDetailOut(BaseModel):
     backup_workstation_count: Optional[int] = None
     backup_vm_count: Optional[int] = None
     backup_mailboxes_count: Optional[int] = None
+    consolidate_license_lines: bool = True
 
 
 class ReportSummaryOut(BaseModel):
@@ -114,9 +116,18 @@ class SellPriceUpsert(BaseModel):
     unit_price: Decimal
 
 
+class PurchaseOrderUpsert(BaseModel):
+    license_line_id: int
+    po_name: str
+
+
 class CustomerMergeRequest(BaseModel):
     keep_customer_id: int
     merge_customer_id: int
+
+
+class CustomerConsolidationUpdate(BaseModel):
+    consolidate: bool
 
 
 class NinjaOrgStatOut(BaseModel):

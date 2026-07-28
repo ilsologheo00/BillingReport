@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { getCustomer, getCustomers, mergeCustomers } from "../api/customers";
+import { getCustomer, getCustomers, mergeCustomers, setConsolidation } from "../api/customers";
 import { updatePrice } from "../api/prices";
+import { updatePurchaseOrder } from "../api/purchaseOrders";
 import { AppShell } from "../components/AppShell";
 import { MoneyCell } from "../components/MoneyCell";
 import { BytesCell } from "../components/BytesCell";
@@ -106,6 +107,72 @@ function PriceCell({ customerId, line, onUpdated }: { customerId: number; line: 
   );
 }
 
+function PoCell({ line, onUpdated }: { line: LicenseLine; onUpdated: () => void }) {
+  const { t } = useLanguage();
+  const [value, setValue] = useState(line.po_name ?? "");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function save() {
+    if (value === (line.po_name ?? "")) return;
+    setSaving(true);
+    setError(null);
+    try {
+      await updatePurchaseOrder(line.id, value);
+      onUpdated();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t("customerDetail.failedToSave"));
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="price-cell">
+      <input
+        type="text"
+        value={value}
+        title={value || undefined}
+        placeholder={t("customerDetail.setPoPlaceholder")}
+        onChange={(e) => setValue(e.target.value)}
+        onBlur={save}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+        }}
+        disabled={saving}
+      />
+      {error && <span className="error-text small">{error}</span>}
+    </div>
+  );
+}
+
+function ConsolidationToggle({ customer, onUpdated }: { customer: CustomerDetail; onUpdated: () => void }) {
+  const { t } = useLanguage();
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function toggle() {
+    setSaving(true);
+    setError(null);
+    try {
+      await setConsolidation(customer.id, !customer.consolidate_license_lines);
+      onUpdated();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t("customerDetail.failedToSave"));
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <label className="consolidation-toggle" title={t("customerDetail.consolidateHint")}>
+      <input type="checkbox" checked={customer.consolidate_license_lines} onChange={toggle} disabled={saving} />
+      {t("customerDetail.consolidateToggle")}
+      {error && <span className="error-text small">{error}</span>}
+    </label>
+  );
+}
+
 export function CustomerDetailPage() {
   const { t } = useLanguage();
   const { id } = useParams<{ id: string }>();
@@ -151,7 +218,7 @@ export function CustomerDetailPage() {
         {!customer ? (
           <>
             <SkeletonStatBar count={5} />
-            <SkeletonTable rows={5} cols={8} />
+            <SkeletonTable rows={5} cols={9} />
           </>
         ) : (
           <>
@@ -230,6 +297,8 @@ export function CustomerDetailPage() {
               </div>
             </div>
 
+            <ConsolidationToggle customer={customer} onUpdated={refresh} />
+
             <table className="data-table">
               <thead>
                 <tr>
@@ -241,6 +310,7 @@ export function CustomerDetailPage() {
                   <th>{t("customerDetail.table.unitPrice")}</th>
                   <th>{t("common.margin")}</th>
                   <th>{t("customerDetail.table.billing")}</th>
+                  <th>{t("customerDetail.table.po")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -258,11 +328,14 @@ export function CustomerDetailPage() {
                       <MarginBadge margin={line.total_margin} marginPct={line.margin_pct} />
                     </td>
                     <td>{line.billing_period ?? "—"}</td>
+                    <td>
+                      <PoCell line={line} onUpdated={refresh} />
+                    </td>
                   </tr>
                 ))}
                 {customer.license_lines.length === 0 && (
                   <tr>
-                    <td colSpan={8} className="empty-row">
+                    <td colSpan={9} className="empty-row">
                       {t("customerDetail.noLines")}
                     </td>
                   </tr>

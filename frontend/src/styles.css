@@ -305,6 +305,17 @@ a {
   color: var(--text-muted);
 }
 
+.consolidation-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+  cursor: pointer;
+  width: fit-content;
+}
+
 .page-eyebrow {
   margin: 0;
   font-size: 0.78rem;

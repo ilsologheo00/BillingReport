@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 from typing import Optional
 
-from app.models import Customer, LicenseLine, SellPrice
+from app.models import Customer, LicenseLine, PurchaseOrder, SellPrice
 
 
 @dataclass
@@ -67,6 +67,10 @@ def aggregate_totals(line_margins: list[LineMargin]) -> Totals:
 
 def sell_price_lookup(prices: list[SellPrice]) -> dict[tuple[int, str], SellPrice]:
     return {(p.customer_id, p.sku): p for p in prices}
+
+
+def purchase_order_lookup(purchase_orders: list[PurchaseOrder]) -> dict[int, PurchaseOrder]:
+    return {po.license_line_id: po for po in purchase_orders}
 
 
 def is_customer_empty(customer: Customer, line_count: int) -> bool:

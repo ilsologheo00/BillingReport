@@ -8,17 +8,22 @@ from app.models import Customer, LicenseLine, SyncLog
 from app.services.ion.base import IonApiError, IonLicenseLineDTO, IonProvider
 
 
-def _consolidate_lines(lines: list[IonLicenseLineDTO]) -> list[IonLicenseLineDTO]:
+def _consolidate_lines(lines: list[IonLicenseLineDTO], no_consolidate_ion_ids: set[str]) -> list[IonLicenseLineDTO]:
     """ION invoices each purchase batch of the same product as its own subscription
     (e.g. 10 seats bought in 2022, 2 more in 2024), so a customer can have several
     lines for the same SKU. Merge those into one line per (customer, sku), summing
     quantities and computing a quantity-weighted average unit cost so total_cost
-    stays accurate."""
+    stays accurate - unless the customer has consolidation disabled (see
+    Customer.consolidate_license_lines), in which case its lines pass through
+    unmerged so each purchase batch can carry its own PurchaseOrder note."""
+    passthrough = [dto for dto in lines if dto.ion_customer_id in no_consolidate_ion_ids]
+    to_consolidate = [dto for dto in lines if dto.ion_customer_id not in no_consolidate_ion_ids]
+
     groups: dict[tuple[str, str], list[IonLicenseLineDTO]] = defaultdict(list)
-    for dto in lines:
+    for dto in to_consolidate:
         groups[(dto.ion_customer_id, dto.sku)].append(dto)
 
-    consolidated = []
+    consolidated = list(passthrough)
     for (ion_customer_id, sku), group in groups.items():
         total_quantity = sum(dto.quantity for dto in group)
         total_cost = sum(dto.unit_cost * dto.quantity for dto in group)
@@ -63,11 +68,16 @@ def sync_all(db: Session, provider: IonProvider) -> SyncLog:
             db.flush()
             customer_id_by_ion_id[dto.ion_customer_id] = customer.id
 
+        no_consolidate_ion_ids = {
+            ion_id
+            for (ion_id,) in db.query(Customer.ion_customer_id).filter(Customer.consolidate_license_lines.is_(False))
+        }
+
         raw_lines = [
             dto for dto in provider.get_license_lines()
             if dto.unit_cost != 0 and dto.quantity != 0 and dto.billing_period != "one_time"
         ]
-        lines = _consolidate_lines(raw_lines)
+        lines = _consolidate_lines(raw_lines, no_consolidate_ion_ids)
         seen_ion_line_ids = set()
         for dto in lines:
             customer_id = customer_id_by_ion_id.get(dto.ion_customer_id)
