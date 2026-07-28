@@ -127,7 +127,7 @@ export function DashboardPage() {
                 <th>{t("common.totalCost")}</th>
                 <th>{t("common.totalPrice")}</th>
                 <th>{t("common.margin")}</th>
-                <th><DeviceIcon width={13} height={13} style={{ verticalAlign: "-2px" }} /> {t("common.devices")}</th>
+                <th><DeviceIcon width={13} height={13} style={{ verticalAlign: "-2px" }} /> {t("dashboard.table.devices")}</th>
                 <th><ShieldIcon width={13} height={13} style={{ verticalAlign: "-2px" }} /> {t("common.sentinelone")}</th>
                 <th><CloudIcon width={13} height={13} style={{ verticalAlign: "-2px" }} /> {t("common.backupUsedTotal")}</th>
                 <th>{t("dashboard.table.machines")}</th>
@@ -161,7 +161,7 @@ export function DashboardPage() {
                   </td>
                   <td>{c.backup_machines_count ?? "—"}</td>
                   <td>
-                    <MailboxCoverageCell backedUp={c.backup_mailboxes_count} licensed={c.exchange_online_licenses} />
+                    <MailboxCoverageCell backedUp={c.backup_mailboxes_count} />
                   </td>
                 </tr>
               ))}

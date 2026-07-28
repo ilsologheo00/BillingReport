@@ -6,7 +6,7 @@ from app.models import Customer, LicenseLine, SellPrice, User
 from app.schemas import CustomerDetailOut, CustomerMergeRequest, CustomerSummaryOut, LicenseLineOut
 from app.security import get_current_user
 from app.services.customer_merge_service import merge_customers
-from app.services.margin_service import aggregate_totals, exchange_online_licenses, is_customer_empty, line_margin, sell_price_lookup
+from app.services.margin_service import aggregate_totals, is_customer_empty, line_margin, sell_price_lookup
 
 router = APIRouter(prefix="/api/customers", tags=["customers"])
 
@@ -45,7 +45,6 @@ def list_customers(db: Session = Depends(get_db), _user: User = Depends(get_curr
                 backup_available_bytes=_backup_available_bytes(customer),
                 backup_machines_count=customer.backup_machines_count,
                 backup_mailboxes_count=customer.backup_mailboxes_count,
-                exchange_online_licenses=exchange_online_licenses(customer),
             )
         )
     return results
@@ -98,7 +97,6 @@ def _customer_detail(db: Session, customer_id: int) -> CustomerDetailOut:
         backup_available_bytes=_backup_available_bytes(customer),
         backup_machines_count=customer.backup_machines_count,
         backup_mailboxes_count=customer.backup_mailboxes_count,
-        exchange_online_licenses=exchange_online_licenses(customer),
     )
 
 

@@ -216,7 +216,7 @@ export function CustomerDetailPage() {
                 <div className="card-stat">
                   <span className="summary-label">{t("customerDetail.backedUpMailboxes")}</span>
                   <span className="summary-value">
-                    <MailboxCoverageCell backedUp={customer.backup_mailboxes_count} licensed={customer.exchange_online_licenses} />
+                    <MailboxCoverageCell backedUp={customer.backup_mailboxes_count} />
                   </span>
                 </div>
               </div>
