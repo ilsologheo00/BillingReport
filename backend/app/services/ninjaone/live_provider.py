@@ -6,21 +6,23 @@ via an "after" cursor on device id) - both verified against a live tenant.
 
 The bulk GET /v2/queries/software endpoint currently 500s on this tenant
 (server-side "DataIntegrityViolationException", reproduced with and without
-query params), so installed software is instead fetched per-device via
-GET /v2/device/{id}/software, run with bounded concurrency since a tenant can
-have 1000+ devices and sequential per-device calls would be too slow for a
-single sync request.
+query params) - but GET /v2/queries/antivirus-status works fine and is used
+to detect SentinelOne coverage instead of the old per-device software-list
+approach. It returns one row per (deviceId, installed AV product) - a device
+can have more than one row if it has several AV products installed (e.g.
+SentinelOne alongside a still-present Microsoft Defender Antivirus row) - with
+`productState` ("ON"/"OFF") telling active from merely-installed-but-disabled.
+Paginated via a `cursor` object ({name, offset, count}), not a plain cursor
+string like the other endpoints - `cursor.name` is passed back as the
+`cursor` query param for the next page, until offset reaches count.
 """
 
 import time
-from concurrent.futures import ThreadPoolExecutor
 
 import httpx
 
 from app.config import Settings
 from app.services.ninjaone.base import NinjaApiError, NinjaOrgStatsDTO
-
-_SOFTWARE_FETCH_CONCURRENCY = 40
 
 
 class LiveNinjaOneProvider:
@@ -40,26 +42,22 @@ class LiveNinjaOneProvider:
             device_count_by_org[org_id] = device_count_by_org.get(org_id, 0) + 1
 
         match = self._settings.ninjaone_sentinelone_match.lower()
-        device_ids = [str(d.get("id")) for d in devices]
-
-        def has_sentinelone(device_id: str) -> bool:
-            try:
-                software = self._get(f"/v2/device/{device_id}/software")
-            except NinjaApiError:
-                return False
-            if not isinstance(software, list):
-                return False
-            return any(match in str(entry.get("name", "")).lower() for entry in software)
+        protected_device_ids: set[str] = set()
+        for item in self._get_antivirus_status():
+            if item.get("productState") != "ON":
+                continue
+            if match not in str(item.get("productName", "")).lower():
+                continue
+            device_id = item.get("deviceId")
+            if device_id is not None:
+                protected_device_ids.add(str(device_id))
 
         sentinelone_count_by_org: dict[str, int] = {}
-        with ThreadPoolExecutor(max_workers=_SOFTWARE_FETCH_CONCURRENCY) as pool:
-            for device_id, found in zip(device_ids, pool.map(has_sentinelone, device_ids)):
-                if not found:
-                    continue
-                org_id = org_id_by_device_id.get(device_id)
-                if org_id is None:
-                    continue
-                sentinelone_count_by_org[org_id] = sentinelone_count_by_org.get(org_id, 0) + 1
+        for device_id in protected_device_ids:
+            org_id = org_id_by_device_id.get(device_id)
+            if org_id is None:
+                continue
+            sentinelone_count_by_org[org_id] = sentinelone_count_by_org.get(org_id, 0) + 1
 
         results = []
         for org_id, org_name in org_name_by_id.items():
@@ -71,6 +69,22 @@ class LiveNinjaOneProvider:
         return results
 
     # -- internals -----------------------------------------------------
+
+    def _get_antivirus_status(self) -> list[dict]:
+        results: list[dict] = []
+        params: dict = {"pageSize": 1000}
+        while True:
+            data = self._get("/v2/queries/antivirus-status", params)
+            batch = data.get("results", []) if isinstance(data, dict) else []
+            if not batch:
+                break
+            results.extend(batch)
+
+            cursor = data.get("cursor") if isinstance(data, dict) else None
+            if not cursor or cursor.get("offset", 0) >= cursor.get("count", 0):
+                break
+            params = {"pageSize": 1000, "cursor": cursor.get("name")}
+        return results
 
     def _fetch_token(self) -> str:
         now = time.time()

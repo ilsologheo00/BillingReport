@@ -130,7 +130,7 @@ export function DashboardPage() {
                 <th><DeviceIcon width={13} height={13} style={{ verticalAlign: "-2px" }} /> {t("common.devices")}</th>
                 <th><ShieldIcon width={13} height={13} style={{ verticalAlign: "-2px" }} /> {t("common.sentinelone")}</th>
                 <th><CloudIcon width={13} height={13} style={{ verticalAlign: "-2px" }} /> {t("common.backupUsedTotal")}</th>
-                <th>{t("common.machines")}</th>
+                <th>{t("dashboard.table.machines")}</th>
                 <th>{t("common.mailboxes")}</th>
               </tr>
             </thead>

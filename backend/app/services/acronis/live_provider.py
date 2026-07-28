@@ -19,7 +19,10 @@ tenant, so treat as a solid-but-unconfirmed starting point:
   usage_name "storage" -> value (bytes used) / offering_item.quota.value
   (bytes quota, absent/None when the tenant's edition has no fixed cap, e.g.
   per-workload billing). usage_name "mailboxes" -> value (number of
-  protected Microsoft 365 seats).
+  protected Microsoft 365 seats), summed with usage_name
+  "m365_seats_shared" -> value (protected shared mailboxes, billed/tracked
+  separately from regular user mailboxes by Acronis but shown here as one
+  combined mailbox count).
 - Resources: GET https://{datacenter}/api/resource_management/v4/resources
   ?tenant_id={id}&applied_only=true (only resources with an active backup
   plan) - used only for the machine count. Confirmed against a live tenant:
@@ -121,7 +124,10 @@ class LiveAcronisProvider:
         mailboxes = active_item("mailboxes")
         mailboxes_count = int(mailboxes.get("value") or 0) if mailboxes is not None else 0
 
-        return total, used, mailboxes_count
+        shared_mailboxes = active_item("m365_seats_shared")
+        shared_mailboxes_count = int(shared_mailboxes.get("value") or 0) if shared_mailboxes is not None else 0
+
+        return total, used, mailboxes_count + shared_mailboxes_count
 
     def _get_machines_count(self, unit_tenant_ids: list[str]) -> int:
         machines_count = 0

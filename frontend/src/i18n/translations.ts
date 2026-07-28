@@ -48,6 +48,7 @@ export const translations = {
     "dashboard.coverage.empty": "No NinjaOne device data yet.",
     "dashboard.table.customer": "Customer",
     "dashboard.table.lines": "# Products",
+    "dashboard.table.machines": "Virtual machines",
     "dashboard.table.empty": 'No customers yet — click "Sync Now" to pull data from ION.',
     "dashboard.table.ninjaOnlyTooltip": "Not present in StreamOne/ION — no billing details available",
 
@@ -136,6 +137,7 @@ export const translations = {
     "dashboard.coverage.empty": "Nessun dato sui device NinjaOne disponibile.",
     "dashboard.table.customer": "Cliente",
     "dashboard.table.lines": "# Prodotti",
+    "dashboard.table.machines": "Macchine virtuali",
     "dashboard.table.empty": 'Nessun cliente ancora — clicca "Sincronizza ora" per importare i dati da ION.',
     "dashboard.table.ninjaOnlyTooltip": "Non presente su StreamOne/ION — nessun dettaglio di fatturazione disponibile",
 
