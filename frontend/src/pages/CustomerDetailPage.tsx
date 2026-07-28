@@ -210,8 +210,16 @@ export function CustomerDetailPage() {
                   <span className="summary-value"><BytesCell value={customer.backup_available_bytes} /></span>
                 </div>
                 <div className="card-stat">
-                  <span className="summary-label">{t("customerDetail.backedUpMachines")}</span>
-                  <span className="summary-value">{customer.backup_machines_count ?? "—"}</span>
+                  <span className="summary-label">{t("customerDetail.backedUpServers")}</span>
+                  <span className="summary-value">{customer.backup_server_count ?? "—"}</span>
+                </div>
+                <div className="card-stat">
+                  <span className="summary-label">{t("customerDetail.backedUpWorkstations")}</span>
+                  <span className="summary-value">{customer.backup_workstation_count ?? "—"}</span>
+                </div>
+                <div className="card-stat">
+                  <span className="summary-label">{t("customerDetail.backedUpVms")}</span>
+                  <span className="summary-value">{customer.backup_vm_count ?? "—"}</span>
                 </div>
                 <div className="card-stat">
                   <span className="summary-label">{t("customerDetail.backedUpMailboxes")}</span>

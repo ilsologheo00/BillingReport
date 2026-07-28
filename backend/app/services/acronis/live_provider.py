@@ -25,16 +25,28 @@ tenant, so treat as a solid-but-unconfirmed starting point:
   here as one combined "Microsoft 365" protected-item count.
 - Resources: GET https://{datacenter}/api/resource_management/v4/resources
   ?tenant_id={id}&applied_only=true (only resources with an active backup
-  plan) - used only for the machine count. Confirmed against a live tenant:
-  resources are registered against the "unit" tenant(s) nested under a
-  "customer" tenant, never against the "customer" tenant itself (querying
-  with the customer tenant id always returns zero items) - so each
-  customer's resources are fetched by first finding all descendant "unit"
-  tenants and querying each of those, aggregating the results. Microsoft 365
-  mailboxes never show up here (confirmed against multiple tenants known to
-  have M365 seats) - Acronis's public API has no endpoint that lists
-  individual protected mailbox addresses, only the aggregate seat count from
-  the usages endpoint above.
+  plan) - split into server/workstation/VM counts (see below). Confirmed
+  against a live tenant: resources are registered against the "unit"
+  tenant(s) nested under a "customer" tenant, never against the "customer"
+  tenant itself (querying with the customer tenant id always returns zero
+  items) - so each customer's resources are fetched by first finding all
+  descendant "unit" tenants and querying each of those, aggregating the
+  results. Microsoft 365 mailboxes never show up here (confirmed against
+  multiple tenants known to have M365 seats) - Acronis's public API has no
+  endpoint that lists individual protected mailbox addresses, only the
+  aggregate seat count from the usages endpoint above.
+- Machine type breakdown: each resource has a `type` field. Hypervisor-backed
+  VMs (`resource.virtual_machine.*` - vmwesx/mshyperv/proxmox confirmed live)
+  count directly as VMs, no extra call needed. NAS devices and any other
+  non-machine resource type count as "server" (infrastructure-class, not a
+  workstation). Agent-installed machines (`resource.machine`) can be either a
+  server or a workstation - telling them apart needs one extra call per such
+  resource, GET .../resource_management/v4/resources/{id}/attributes, whose
+  "default" attribute group has `operating_system_product_type`: this is the
+  classic Windows `GetVersionEx` ProductType enum (1 = workstation, 2 = domain
+  controller, 3 = server - confirmed live: a Windows 11 Pro machine reports
+  1). Anything else (missing value, non-Windows OS) defaults to "server"
+  rather than silently miscounting it as a workstation.
 """
 
 import base64
@@ -82,13 +94,15 @@ class LiveAcronisProvider:
         def fetch_one(tenant: dict) -> AcronisTenantStatsDTO:
             tenant_id = tenant["id"]
             total_bytes, used_bytes, mailboxes_count = self._get_usages(tenant_id)
-            machines_count = self._get_machines_count(descendant_unit_ids(tenant_id))
+            server_count, workstation_count, vm_count = self._get_machine_counts(descendant_unit_ids(tenant_id))
             return AcronisTenantStatsDTO(
                 tenant_id=tenant_id,
                 tenant_name=tenant.get("name", ""),
                 backup_total_bytes=total_bytes,
                 backup_used_bytes=used_bytes,
-                backup_machines_count=machines_count,
+                backup_server_count=server_count,
+                backup_workstation_count=workstation_count,
+                backup_vm_count=vm_count,
                 backup_mailboxes_count=mailboxes_count,
             )
 
@@ -132,15 +146,50 @@ class LiveAcronisProvider:
 
         return total, used, mailboxes_count + shared_mailboxes_count + sharepoint_sites_count
 
-    def _get_machines_count(self, unit_tenant_ids: list[str]) -> int:
-        machines_count = 0
+    def _get_machine_counts(self, unit_tenant_ids: list[str]) -> tuple[int, int, int]:
+        resources: list[dict] = []
         for unit_tenant_id in unit_tenant_ids:
-            resources = self._get_all_pages(
+            resources.extend(self._get_all_pages(
                 self._resource_url("/resource_management/v4/resources"),
                 params={"tenant_id": unit_tenant_id, "applied_only": "true"},
-            )
-            machines_count += len(resources)
-        return machines_count
+            ))
+
+        server_count = 0
+        workstation_count = 0
+        vm_count = 0
+        agent_machine_ids: list[str] = []
+        for resource in resources:
+            resource_type = resource.get("type", "")
+            if resource_type.startswith("resource.virtual_machine"):
+                vm_count += 1
+            elif resource_type == "resource.machine":
+                agent_machine_ids.append(resource["id"])
+            else:
+                server_count += 1
+
+        for resource_id in agent_machine_ids:
+            if self._get_os_product_type(resource_id) == 1:
+                workstation_count += 1
+            else:
+                server_count += 1
+
+        return server_count, workstation_count, vm_count
+
+    def _get_os_product_type(self, resource_id: str) -> int | None:
+        try:
+            data = self._get(self._resource_url(f"/resource_management/v4/resources/{resource_id}/attributes"))
+        except AcronisApiError:
+            return None
+        for group in data.get("items", []) if isinstance(data, dict) else []:
+            if group.get("name") != "default":
+                continue
+            for kv in group.get("kvs", []):
+                if kv.get("key") == "operating_system_product_type":
+                    try:
+                        return int(kv.get("value"))
+                    except (TypeError, ValueError):
+                        return None
+        return None
 
     def _fetch_token(self) -> str:
         now = time.time()

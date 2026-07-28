@@ -11,7 +11,9 @@ def apply_acronis_stats_to_customer(customer: Customer, row: AcronisOrgStat) -> 
     customer.acronis_tenant_name = row.tenant_name
     customer.backup_total_bytes = row.backup_total_bytes
     customer.backup_used_bytes = row.backup_used_bytes
-    customer.backup_machines_count = row.backup_machines_count
+    customer.backup_server_count = row.backup_server_count
+    customer.backup_workstation_count = row.backup_workstation_count
+    customer.backup_vm_count = row.backup_vm_count
     customer.backup_mailboxes_count = row.backup_mailboxes_count
     customer.acronis_synced_at = datetime.utcnow()
 
@@ -46,7 +48,9 @@ def acronis_sync_all(db: Session, provider: AcronisProvider) -> AcronisSyncLog:
             row.tenant_name = stat.tenant_name
             row.backup_total_bytes = stat.backup_total_bytes
             row.backup_used_bytes = stat.backup_used_bytes
-            row.backup_machines_count = stat.backup_machines_count
+            row.backup_server_count = stat.backup_server_count
+            row.backup_workstation_count = stat.backup_workstation_count
+            row.backup_vm_count = stat.backup_vm_count
             row.backup_mailboxes_count = stat.backup_mailboxes_count
             row.synced_at = datetime.utcnow()
 

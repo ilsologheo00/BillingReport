@@ -74,7 +74,9 @@ class CustomerSummaryOut(BaseModel):
     backup_total_bytes: Optional[Decimal] = None
     backup_used_bytes: Optional[Decimal] = None
     backup_available_bytes: Optional[Decimal] = None
-    backup_machines_count: Optional[int] = None
+    backup_server_count: Optional[int] = None
+    backup_workstation_count: Optional[int] = None
+    backup_vm_count: Optional[int] = None
     backup_mailboxes_count: Optional[int] = None
 
 
@@ -92,7 +94,9 @@ class CustomerDetailOut(BaseModel):
     backup_total_bytes: Optional[Decimal] = None
     backup_used_bytes: Optional[Decimal] = None
     backup_available_bytes: Optional[Decimal] = None
-    backup_machines_count: Optional[int] = None
+    backup_server_count: Optional[int] = None
+    backup_workstation_count: Optional[int] = None
+    backup_vm_count: Optional[int] = None
     backup_mailboxes_count: Optional[int] = None
 
 
@@ -152,7 +156,9 @@ class AcronisOrgStatOut(BaseModel):
     tenant_name: str
     backup_total_bytes: Optional[Decimal] = None
     backup_used_bytes: Decimal
-    backup_machines_count: int
+    backup_server_count: int
+    backup_workstation_count: int
+    backup_vm_count: int
     backup_mailboxes_count: int
     synced_at: datetime
 

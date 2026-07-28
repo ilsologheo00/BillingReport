@@ -32,7 +32,9 @@ export interface CustomerSummary {
   backup_total_bytes: string | null;
   backup_used_bytes: string | null;
   backup_available_bytes: string | null;
-  backup_machines_count: number | null;
+  backup_server_count: number | null;
+  backup_workstation_count: number | null;
+  backup_vm_count: number | null;
   backup_mailboxes_count: number | null;
 }
 
@@ -69,7 +71,9 @@ export interface CustomerDetail {
   backup_total_bytes: string | null;
   backup_used_bytes: string | null;
   backup_available_bytes: string | null;
-  backup_machines_count: number | null;
+  backup_server_count: number | null;
+  backup_workstation_count: number | null;
+  backup_vm_count: number | null;
   backup_mailboxes_count: number | null;
 }
 
@@ -103,7 +107,9 @@ export interface AcronisOrgStat {
   tenant_name: string;
   backup_total_bytes: string | null;
   backup_used_bytes: string;
-  backup_machines_count: number;
+  backup_server_count: number;
+  backup_workstation_count: number;
+  backup_vm_count: number;
   backup_mailboxes_count: number;
   synced_at: string;
 }

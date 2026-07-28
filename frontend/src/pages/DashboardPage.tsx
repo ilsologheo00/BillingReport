@@ -5,6 +5,7 @@ import { AppShell } from "../components/AppShell";
 import { MoneyCell, formatMoney } from "../components/MoneyCell";
 import { BytesCell } from "../components/BytesCell";
 import { MailboxCoverageCell } from "../components/MailboxCoverageCell";
+import { MachineBreakdownCell } from "../components/MachineBreakdownCell";
 import { MarginBadge } from "../components/MarginBadge";
 import { HorizontalBarChart } from "../components/BarChart";
 import { CoverageMeter } from "../components/CoverageMeter";
@@ -159,7 +160,13 @@ export function DashboardPage() {
                       "—"
                     )}
                   </td>
-                  <td>{c.backup_machines_count ?? "—"}</td>
+                  <td>
+                    <MachineBreakdownCell
+                      serverCount={c.backup_server_count}
+                      workstationCount={c.backup_workstation_count}
+                      vmCount={c.backup_vm_count}
+                    />
+                  </td>
                   <td>
                     <MailboxCoverageCell backedUp={c.backup_mailboxes_count} />
                   </td>

@@ -4,6 +4,7 @@ import { getCustomers } from "../api/customers";
 import { createStandaloneCustomer, getUnmappedTenants, saveTenantMapping } from "../api/acronis";
 import { AppShell } from "../components/AppShell";
 import { BytesCell } from "../components/BytesCell";
+import { MachineBreakdownCell } from "../components/MachineBreakdownCell";
 import { SkeletonTable } from "../components/Skeleton";
 import { useLanguage } from "../i18n/LanguageContext";
 import type { AcronisOrgStat, CustomerSummary } from "../api/types";
@@ -53,7 +54,13 @@ function MappingRow({
     <tr>
       <td>{tenant.tenant_name}</td>
       <td><BytesCell value={tenant.backup_used_bytes} /> / <BytesCell value={tenant.backup_total_bytes} /></td>
-      <td>{tenant.backup_machines_count}</td>
+      <td>
+        <MachineBreakdownCell
+          serverCount={tenant.backup_server_count}
+          workstationCount={tenant.backup_workstation_count}
+          vmCount={tenant.backup_vm_count}
+        />
+      </td>
       <td>{tenant.backup_mailboxes_count}</td>
       <td>
         <select value={customerId} onChange={(e) => setCustomerId(e.target.value)} disabled={saving}>

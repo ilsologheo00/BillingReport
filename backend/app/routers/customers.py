@@ -43,7 +43,9 @@ def list_customers(db: Session = Depends(get_db), _user: User = Depends(get_curr
                 backup_total_bytes=customer.backup_total_bytes,
                 backup_used_bytes=customer.backup_used_bytes,
                 backup_available_bytes=_backup_available_bytes(customer),
-                backup_machines_count=customer.backup_machines_count,
+                backup_server_count=customer.backup_server_count,
+                backup_workstation_count=customer.backup_workstation_count,
+                backup_vm_count=customer.backup_vm_count,
                 backup_mailboxes_count=customer.backup_mailboxes_count,
             )
         )
@@ -95,7 +97,9 @@ def _customer_detail(db: Session, customer_id: int) -> CustomerDetailOut:
         backup_total_bytes=customer.backup_total_bytes,
         backup_used_bytes=customer.backup_used_bytes,
         backup_available_bytes=_backup_available_bytes(customer),
-        backup_machines_count=customer.backup_machines_count,
+        backup_server_count=customer.backup_server_count,
+        backup_workstation_count=customer.backup_workstation_count,
+        backup_vm_count=customer.backup_vm_count,
         backup_mailboxes_count=customer.backup_mailboxes_count,
     )
 
