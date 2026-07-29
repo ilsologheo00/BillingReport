@@ -76,6 +76,9 @@ export interface CustomerDetail {
   backup_workstation_count: number | null;
   backup_vm_count: number | null;
   backup_mailboxes_count: number | null;
+  dr_storage_total_bytes: string | null;
+  dr_storage_used_bytes: string | null;
+  dr_storage_available_bytes: string | null;
   consolidate_license_lines: boolean;
 }
 

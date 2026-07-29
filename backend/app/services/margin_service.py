@@ -83,4 +83,5 @@ def is_customer_empty(customer: Customer, line_count: int) -> bool:
         and not customer.backup_workstation_count
         and not customer.backup_vm_count
         and not customer.backup_mailboxes_count
+        and not customer.dr_storage_used_bytes
     )

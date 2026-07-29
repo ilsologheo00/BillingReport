@@ -33,7 +33,7 @@ export function LoginPage() {
   return (
     <div className="login-page">
       <form className="login-form" onSubmit={handleSubmit}>
-        <h1>BillingReport</h1>
+        <h1>Billing Report</h1>
         <p className="subtitle">{t("login.subtitle")}</p>
         <label>
           {t("login.username")}

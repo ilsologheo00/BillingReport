@@ -12,6 +12,8 @@ class AcronisTenantStatsDTO(BaseModel):
     backup_workstation_count: int
     backup_vm_count: int
     backup_mailboxes_count: int  # protected Microsoft 365 seats; Acronis's API does not expose individual mailbox addresses
+    dr_storage_total_bytes: int | None  # None means no fixed quota (e.g. per-workload billing)
+    dr_storage_used_bytes: int
 
 
 class AcronisApiError(Exception):

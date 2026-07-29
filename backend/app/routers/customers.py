@@ -29,6 +29,12 @@ def _backup_available_bytes(customer: Customer):
     return customer.backup_total_bytes - customer.backup_used_bytes
 
 
+def _dr_storage_available_bytes(customer: Customer):
+    if customer.dr_storage_total_bytes is None or customer.dr_storage_used_bytes is None:
+        return None
+    return customer.dr_storage_total_bytes - customer.dr_storage_used_bytes
+
+
 @router.get("", response_model=list[CustomerSummaryOut])
 def list_customers(db: Session = Depends(get_db), _user: User = Depends(get_current_user)):
     customers = db.query(Customer).order_by(Customer.name).all()
@@ -117,6 +123,9 @@ def _customer_detail(db: Session, customer_id: int) -> CustomerDetailOut:
         backup_workstation_count=customer.backup_workstation_count,
         backup_vm_count=customer.backup_vm_count,
         backup_mailboxes_count=customer.backup_mailboxes_count,
+        dr_storage_total_bytes=customer.dr_storage_total_bytes,
+        dr_storage_used_bytes=customer.dr_storage_used_bytes,
+        dr_storage_available_bytes=_dr_storage_available_bytes(customer),
         consolidate_license_lines=customer.consolidate_license_lines is not False,
     )
 

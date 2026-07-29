@@ -56,6 +56,8 @@ class Customer(Base):
     backup_workstation_count = Column(Integer, nullable=True)
     backup_vm_count = Column(Integer, nullable=True)
     backup_mailboxes_count = Column(Integer, nullable=True)
+    dr_storage_total_bytes = Column(Numeric(20, 0), nullable=True)
+    dr_storage_used_bytes = Column(Numeric(20, 0), nullable=True)
     acronis_synced_at = Column(DateTime, nullable=True)
 
     license_lines = relationship("LicenseLine", back_populates="customer", cascade="all, delete-orphan")
@@ -185,6 +187,8 @@ class AcronisOrgStat(Base):
     backup_workstation_count = Column(Integer, default=0)
     backup_vm_count = Column(Integer, default=0)
     backup_mailboxes_count = Column(Integer, default=0)
+    dr_storage_total_bytes = Column(Numeric(20, 0), nullable=True)
+    dr_storage_used_bytes = Column(Numeric(20, 0), default=0)
     customer_id = Column(Integer, ForeignKey("customers.id"), nullable=True)
     synced_at = Column(DateTime, default=datetime.utcnow)
 

@@ -294,6 +294,22 @@ export function CustomerDetailPage() {
                     <MailboxCoverageCell backedUp={customer.backup_mailboxes_count} />
                   </span>
                 </div>
+                <div className="card-stat">
+                  <span className="summary-label">{t("customerDetail.drStorage")}</span>
+                  <span className="summary-value">
+                    {customer.dr_storage_used_bytes !== null ? (
+                      customer.dr_storage_total_bytes !== null ? (
+                        <>
+                          <BytesCell value={customer.dr_storage_used_bytes} /> / <BytesCell value={customer.dr_storage_total_bytes} />
+                        </>
+                      ) : (
+                        <BytesCell value={customer.dr_storage_used_bytes} />
+                      )
+                    ) : (
+                      "—"
+                    )}
+                  </span>
+                </div>
               </div>
             </div>
 

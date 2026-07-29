@@ -15,6 +15,8 @@ def apply_acronis_stats_to_customer(customer: Customer, row: AcronisOrgStat) -> 
     customer.backup_workstation_count = row.backup_workstation_count
     customer.backup_vm_count = row.backup_vm_count
     customer.backup_mailboxes_count = row.backup_mailboxes_count
+    customer.dr_storage_total_bytes = row.dr_storage_total_bytes
+    customer.dr_storage_used_bytes = row.dr_storage_used_bytes
     customer.acronis_synced_at = datetime.utcnow()
 
 
@@ -52,6 +54,8 @@ def acronis_sync_all(db: Session, provider: AcronisProvider) -> AcronisSyncLog:
             row.backup_workstation_count = stat.backup_workstation_count
             row.backup_vm_count = stat.backup_vm_count
             row.backup_mailboxes_count = stat.backup_mailboxes_count
+            row.dr_storage_total_bytes = stat.dr_storage_total_bytes
+            row.dr_storage_used_bytes = stat.dr_storage_used_bytes
             row.synced_at = datetime.utcnow()
 
             # A manually-mapped tenant (or one auto-matched on a previous

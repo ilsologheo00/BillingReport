@@ -22,7 +22,11 @@ tenant, so treat as a solid-but-unconfirmed starting point:
   protected Microsoft 365 seats), summed with "m365_seats_shared" (protected
   shared mailboxes) and "o365_sharepoint_sites" (protected SharePoint Online
   sites) - all billed/tracked as separate line items by Acronis but shown
-  here as one combined "Microsoft 365" protected-item count.
+  here as one combined "Microsoft 365" protected-item count. usage_name
+  "dr_storage" -> value (bytes used in Disaster Recovery storage) /
+  offering_item.quota.value (always None/no fixed cap on every tenant checked
+  live in this account - per-workload billing - but read the same way as
+  "storage" in case some edition does cap it).
 - Resources: GET https://{datacenter}/api/resource_management/v4/resources
   ?tenant_id={id}&applied_only=true (only resources with an active backup
   plan) - split into server/workstation/VM counts (see below). Confirmed
@@ -93,7 +97,7 @@ class LiveAcronisProvider:
 
         def fetch_one(tenant: dict) -> AcronisTenantStatsDTO:
             tenant_id = tenant["id"]
-            total_bytes, used_bytes, mailboxes_count = self._get_usages(tenant_id)
+            total_bytes, used_bytes, mailboxes_count, dr_total_bytes, dr_used_bytes = self._get_usages(tenant_id)
             server_count, workstation_count, vm_count = self._get_machine_counts(descendant_unit_ids(tenant_id))
             return AcronisTenantStatsDTO(
                 tenant_id=tenant_id,
@@ -104,6 +108,8 @@ class LiveAcronisProvider:
                 backup_workstation_count=workstation_count,
                 backup_vm_count=vm_count,
                 backup_mailboxes_count=mailboxes_count,
+                dr_storage_total_bytes=dr_total_bytes,
+                dr_storage_used_bytes=dr_used_bytes,
             )
 
         with ThreadPoolExecutor(max_workers=_TENANT_FETCH_CONCURRENCY) as pool:
@@ -120,7 +126,7 @@ class LiveAcronisProvider:
     def _resource_url(self, path: str) -> str:
         return f"https://{self._datacenter_host()}/api{path}"
 
-    def _get_usages(self, tenant_id: str) -> tuple[int | None, int, int]:
+    def _get_usages(self, tenant_id: str) -> tuple[int | None, int, int, int | None, int]:
         data = self._get(self._account_url(f"/tenants/{tenant_id}/usages"))
         items = data.get("items", []) if isinstance(data, dict) else []
 
@@ -144,7 +150,12 @@ class LiveAcronisProvider:
         sharepoint_sites = active_item("o365_sharepoint_sites")
         sharepoint_sites_count = int(sharepoint_sites.get("value") or 0) if sharepoint_sites is not None else 0
 
-        return total, used, mailboxes_count + shared_mailboxes_count + sharepoint_sites_count
+        dr_storage = active_item("dr_storage")
+        dr_used = int(dr_storage.get("value") or 0) if dr_storage is not None else 0
+        dr_quota_value = (dr_storage.get("offering_item") or {}).get("quota", {}).get("value") if dr_storage is not None else None
+        dr_total = int(dr_quota_value) if dr_quota_value is not None else None
+
+        return total, used, mailboxes_count + shared_mailboxes_count + sharepoint_sites_count, dr_total, dr_used
 
     def _get_machine_counts(self, unit_tenant_ids: list[str]) -> tuple[int, int, int]:
         resources: list[dict] = []

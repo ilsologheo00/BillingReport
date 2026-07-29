@@ -99,6 +99,9 @@ class CustomerDetailOut(BaseModel):
     backup_workstation_count: Optional[int] = None
     backup_vm_count: Optional[int] = None
     backup_mailboxes_count: Optional[int] = None
+    dr_storage_total_bytes: Optional[Decimal] = None
+    dr_storage_used_bytes: Optional[Decimal] = None
+    dr_storage_available_bytes: Optional[Decimal] = None
     consolidate_license_lines: bool = True
 
 
