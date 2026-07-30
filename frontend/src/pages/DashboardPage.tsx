@@ -22,6 +22,7 @@ export function DashboardPage() {
   const [summary, setSummary] = useState<ReportSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
 
   async function refresh() {
     setLoading(true);
@@ -54,6 +55,11 @@ export function DashboardPage() {
     .sort((a, b) => (b.device_count ?? 0) - (a.device_count ?? 0))
     .slice(0, 8);
 
+  const query = search.trim().toLowerCase();
+  const filteredCustomers = query
+    ? customers.filter((c) => c.name.toLowerCase().includes(query))
+    : customers;
+
   return (
     <AppShell>
       <div className="page">
@@ -62,6 +68,16 @@ export function DashboardPage() {
             <p className="page-eyebrow">{t("dashboard.eyebrow")}</p>
             <h1>{t("dashboard.title")}</h1>
           </div>
+          <label className="table-search-label">
+            {t("dashboard.table.searchLabel")}
+            <input
+              type="search"
+              className="table-search"
+              placeholder={t("dashboard.table.searchPlaceholder")}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </label>
         </header>
 
         {error && <div className="error-text">{error}</div>}
@@ -136,7 +152,7 @@ export function DashboardPage() {
               </tr>
             </thead>
             <tbody>
-              {customers.map((c) => (
+              {filteredCustomers.map((c) => (
                 <tr key={c.id}>
                   <td>
                     <Link to={`/customers/${c.id}`} title={!c.ion_customer_id ? t("dashboard.table.ninjaOnlyTooltip") : undefined}>
@@ -172,10 +188,10 @@ export function DashboardPage() {
                   </td>
                 </tr>
               ))}
-              {customers.length === 0 && (
+              {filteredCustomers.length === 0 && (
                 <tr>
                   <td colSpan={10} className="empty-row">
-                    {t("dashboard.table.empty")}
+                    {customers.length === 0 ? t("dashboard.table.empty") : t("dashboard.table.noMatches")}
                   </td>
                 </tr>
               )}

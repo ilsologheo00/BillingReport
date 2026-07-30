@@ -53,6 +53,9 @@ export const translations = {
     "dashboard.table.devices": "NinjaOne devices",
     "dashboard.table.machines": "Machines",
     "dashboard.table.empty": 'No customers yet — click "Sync Now" to pull data from ION.',
+    "dashboard.table.noMatches": "No customers match your search.",
+    "dashboard.table.searchLabel": "Search customer",
+    "dashboard.table.searchPlaceholder": "Search customers…",
     "dashboard.table.ninjaOnlyTooltip": "Not present in StreamOne/ION — no billing details available",
 
     "customerDetail.ninjaone.title": "NinjaOne",
@@ -156,6 +159,9 @@ export const translations = {
     "dashboard.table.devices": "Device NinjaOne",
     "dashboard.table.machines": "Macchine",
     "dashboard.table.empty": 'Nessun cliente ancora — clicca "Sincronizza ora" per importare i dati da ION.',
+    "dashboard.table.noMatches": "Nessun cliente corrisponde alla ricerca.",
+    "dashboard.table.searchLabel": "Ricerca cliente",
+    "dashboard.table.searchPlaceholder": "Cerca cliente…",
     "dashboard.table.ninjaOnlyTooltip": "Non presente su StreamOne/ION — nessun dettaglio di fatturazione disponibile",
 
     "customerDetail.ninjaone.title": "NinjaOne",

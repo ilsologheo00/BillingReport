@@ -297,6 +297,22 @@ a {
   color: var(--text);
 }
 
+.table-search-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.table-search {
+  width: 260px;
+  padding: 8px 12px;
+}
+
 .merge-control {
   display: flex;
   align-items: center;
