@@ -24,6 +24,21 @@ import httpx
 from app.config import Settings
 from app.services.ninjaone.base import NinjaApiError, NinjaOrgStatsDTO
 
+# nodeClass values NinjaOne returns for /v2/devices that do NOT have a Ninja
+# agent installed - network-discovered devices (NMS_*: switches, printers,
+# firewalls, phones, ...) and the VMware host/guest records that come from
+# the ESXi/vCenter integration rather than an agent inside the VM. Verified
+# against a live tenant (see nodeClass breakdown across all orgs) - counting
+# these inflated per-customer device_count well above actual agent count.
+_NON_AGENT_NODE_CLASSES = {"VMWARE_VM_GUEST", "VMWARE_VM_HOST"}
+
+
+def _has_agent(device: dict) -> bool:
+    node_class = str(device.get("nodeClass", ""))
+    if node_class.startswith("NMS_"):
+        return False
+    return node_class not in _NON_AGENT_NODE_CLASSES
+
 
 class LiveNinjaOneProvider:
     def __init__(self, settings: Settings):
@@ -38,7 +53,10 @@ class LiveNinjaOneProvider:
         devices = self._get_all_pages("/v2/devices", after_field="id")
         org_id_by_device_id = {str(d.get("id")): str(d.get("organizationId")) for d in devices}
         device_count_by_org: dict[str, int] = {}
-        for org_id in org_id_by_device_id.values():
+        for device in devices:
+            if not _has_agent(device):
+                continue
+            org_id = str(device.get("organizationId"))
             device_count_by_org[org_id] = device_count_by_org.get(org_id, 0) + 1
 
         match = self._settings.ninjaone_sentinelone_match.lower()
