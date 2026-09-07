@@ -52,17 +52,19 @@ function MappingRow({
 
   return (
     <tr>
-      <td>{tenant.tenant_name}</td>
-      <td><BytesCell value={tenant.backup_used_bytes} /> / <BytesCell value={tenant.backup_total_bytes} /></td>
-      <td>
+      <td data-label={t("acronisMapping.table.tenant")}>{tenant.tenant_name}</td>
+      <td data-label={t("common.backupUsedTotal")}>
+        <BytesCell value={tenant.backup_used_bytes} /> / <BytesCell value={tenant.backup_total_bytes} />
+      </td>
+      <td data-label={t("common.machines")}>
         <MachineBreakdownCell
           serverCount={tenant.backup_server_count}
           workstationCount={tenant.backup_workstation_count}
           vmCount={tenant.backup_vm_count}
         />
       </td>
-      <td>{tenant.backup_mailboxes_count}</td>
-      <td>
+      <td data-label={t("common.mailboxes")}>{tenant.backup_mailboxes_count}</td>
+      <td data-label={t("dashboard.table.customer")}>
         <select value={customerId} onChange={(e) => setCustomerId(e.target.value)} disabled={saving}>
           <option value="">{t("common.selectCustomer")}</option>
           {customers.map((c) => (
@@ -72,14 +74,14 @@ function MappingRow({
           ))}
         </select>
       </td>
-      <td>
+      <td data-label={t("common.actions")}>
         <button onClick={save} disabled={saving || !customerId}>
           {saving ? t("common.saving") : t("common.save")}
         </button>{" "}
         <button onClick={saveStandalone} disabled={saving}>
           {t("ninjaMapping.noIonCustomer")}
         </button>
-        {error && <span className="error-text small">{error}</span>}
+        {error && <span className="error-text small" role="alert">{error}</span>}
       </td>
     </tr>
   );
@@ -127,11 +129,12 @@ export function AcronisMappingPage() {
           </div>
         </header>
 
-        {error && <div className="error-text">{error}</div>}
+        {error && <div className="error-text" role="alert">{error}</div>}
 
         {loading ? (
           <SkeletonTable rows={5} cols={6} />
         ) : (
+          <div className="table-scroll">
           <table className="data-table">
             <thead>
               <tr>
@@ -140,7 +143,7 @@ export function AcronisMappingPage() {
                 <th>{t("common.machines")}</th>
                 <th>{t("common.mailboxes")}</th>
                 <th>{t("dashboard.table.customer")}</th>
-                <th></th>
+                <th>{t("common.actions")}</th>
               </tr>
             </thead>
             <tbody>
@@ -156,6 +159,7 @@ export function AcronisMappingPage() {
               )}
             </tbody>
           </table>
+          </div>
         )}
       </div>
     </AppShell>

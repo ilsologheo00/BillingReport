@@ -50,10 +50,10 @@ function MappingRow({
 
   return (
     <tr>
-      <td>{org.org_name}</td>
-      <td>{org.device_count}</td>
-      <td>{org.sentinelone_count}</td>
-      <td>
+      <td data-label={t("ninjaMapping.table.org")}>{org.org_name}</td>
+      <td data-label={t("common.devices")}>{org.device_count}</td>
+      <td data-label={t("common.sentinelone")}>{org.sentinelone_count}</td>
+      <td data-label={t("dashboard.table.customer")}>
         <select value={customerId} onChange={(e) => setCustomerId(e.target.value)} disabled={saving}>
           <option value="">{t("common.selectCustomer")}</option>
           {customers.map((c) => (
@@ -63,14 +63,14 @@ function MappingRow({
           ))}
         </select>
       </td>
-      <td>
+      <td data-label={t("common.actions")}>
         <button onClick={save} disabled={saving || !customerId}>
           {saving ? t("common.saving") : t("common.save")}
         </button>{" "}
         <button onClick={saveStandalone} disabled={saving}>
           {t("ninjaMapping.noIonCustomer")}
         </button>
-        {error && <span className="error-text small">{error}</span>}
+        {error && <span className="error-text small" role="alert">{error}</span>}
       </td>
     </tr>
   );
@@ -118,11 +118,12 @@ export function NinjaOneMappingPage() {
           </div>
         </header>
 
-        {error && <div className="error-text">{error}</div>}
+        {error && <div className="error-text" role="alert">{error}</div>}
 
         {loading ? (
           <SkeletonTable rows={5} cols={5} />
         ) : (
+          <div className="table-scroll">
           <table className="data-table">
             <thead>
               <tr>
@@ -130,7 +131,7 @@ export function NinjaOneMappingPage() {
                 <th>{t("common.devices")}</th>
                 <th>{t("common.sentinelone")}</th>
                 <th>{t("dashboard.table.customer")}</th>
-                <th></th>
+                <th>{t("common.actions")}</th>
               </tr>
             </thead>
             <tbody>
@@ -146,6 +147,7 @@ export function NinjaOneMappingPage() {
               )}
             </tbody>
           </table>
+          </div>
         )}
       </div>
     </AppShell>

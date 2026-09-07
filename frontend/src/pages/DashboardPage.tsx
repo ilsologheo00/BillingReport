@@ -80,7 +80,7 @@ export function DashboardPage() {
           </label>
         </header>
 
-        {error && <div className="error-text">{error}</div>}
+        {error && <div className="error-text" role="alert">{error}</div>}
 
         {loading && !summary ? (
           <SkeletonStatBar count={4} />
@@ -136,6 +136,7 @@ export function DashboardPage() {
         {loading ? (
           <SkeletonTable rows={6} cols={10} />
         ) : (
+          <div className="table-scroll">
           <table className="data-table">
             <thead>
               <tr>
@@ -154,20 +155,20 @@ export function DashboardPage() {
             <tbody>
               {filteredCustomers.map((c) => (
                 <tr key={c.id}>
-                  <td>
+                  <td data-label={t("dashboard.table.customer")}>
                     <Link to={`/customers/${c.id}`} title={!c.ion_customer_id ? t("dashboard.table.ninjaOnlyTooltip") : undefined}>
                       {c.name}
                     </Link>
                   </td>
-                  <td>{c.line_count}</td>
-                  <td><MoneyCell value={c.total_cost} /></td>
-                  <td><MoneyCell value={c.total_price} /></td>
-                  <td>
+                  <td data-label={t("dashboard.table.lines")}>{c.line_count}</td>
+                  <td data-label={t("common.totalCost")}><MoneyCell value={c.total_cost} /></td>
+                  <td data-label={t("common.totalPrice")}><MoneyCell value={c.total_price} /></td>
+                  <td data-label={t("common.margin")}>
                     <MarginBadge margin={c.total_margin} marginPct={c.margin_pct} />
                   </td>
-                  <td>{c.device_count ?? "—"}</td>
-                  <td>{c.sentinelone_count ?? "—"}</td>
-                  <td>
+                  <td data-label={t("dashboard.table.devices")}>{c.device_count ?? "—"}</td>
+                  <td data-label={t("common.sentinelone")}>{c.sentinelone_count ?? "—"}</td>
+                  <td data-label={t("common.backupUsedTotal")}>
                     {c.backup_used_bytes !== null ? (
                       <>
                         <BytesCell value={c.backup_used_bytes} /> / <BytesCell value={c.backup_total_bytes} />
@@ -176,14 +177,14 @@ export function DashboardPage() {
                       "—"
                     )}
                   </td>
-                  <td>
+                  <td data-label={t("dashboard.table.machines")}>
                     <MachineBreakdownCell
                       serverCount={c.backup_server_count}
                       workstationCount={c.backup_workstation_count}
                       vmCount={c.backup_vm_count}
                     />
                   </td>
-                  <td>
+                  <td data-label={t("common.mailboxes")}>
                     <MailboxCoverageCell backedUp={c.backup_mailboxes_count} />
                   </td>
                 </tr>
@@ -197,6 +198,7 @@ export function DashboardPage() {
               )}
             </tbody>
           </table>
+          </div>
         )}
       </div>
     </AppShell>

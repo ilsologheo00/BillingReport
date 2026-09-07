@@ -60,7 +60,7 @@ function MergeControl({ customer, onMerged }: { customer: CustomerDetail; onMerg
       <button onClick={merge} disabled={merging || !otherId}>
         {merging ? t("customerDetail.merge.merging") : t("customerDetail.merge.button")}
       </button>
-      {error && <span className="error-text small">{error}</span>}
+      {error && <span className="error-text small" role="alert">{error}</span>}
     </div>
   );
 }
@@ -102,7 +102,7 @@ function PriceCell({ customerId, line, onUpdated }: { customerId: number; line: 
         }}
         disabled={saving}
       />
-      {error && <span className="error-text small">{error}</span>}
+      {error && <span className="error-text small" role="alert">{error}</span>}
     </div>
   );
 }
@@ -141,7 +141,7 @@ function PoCell({ line, onUpdated }: { line: LicenseLine; onUpdated: () => void 
         }}
         disabled={saving}
       />
-      {error && <span className="error-text small">{error}</span>}
+      {error && <span className="error-text small" role="alert">{error}</span>}
     </div>
   );
 }
@@ -168,7 +168,7 @@ function ConsolidationToggle({ customer, onUpdated }: { customer: CustomerDetail
     <label className="consolidation-toggle" title={t("customerDetail.consolidateHint")}>
       <input type="checkbox" checked={customer.consolidate_license_lines} onChange={toggle} disabled={saving} />
       {t("customerDetail.consolidateToggle")}
-      {error && <span className="error-text small">{error}</span>}
+      {error && <span className="error-text small" role="alert">{error}</span>}
     </label>
   );
 }
@@ -197,7 +197,7 @@ export function CustomerDetailPage() {
   if (error) {
     return (
       <AppShell>
-        <div className="page error-text">{error}</div>
+        <div className="page error-text" role="alert">{error}</div>
       </AppShell>
     );
   }
@@ -315,6 +315,7 @@ export function CustomerDetailPage() {
 
             <ConsolidationToggle customer={customer} onUpdated={refresh} />
 
+            <div className="table-scroll">
             <table className="data-table">
               <thead>
                 <tr>
@@ -332,19 +333,19 @@ export function CustomerDetailPage() {
               <tbody>
                 {customer.license_lines.map((line) => (
                   <tr key={line.id}>
-                    <td>{line.product_name}</td>
-                    <td>{line.vendor}</td>
-                    <td>{line.sku}</td>
-                    <td>{line.quantity}</td>
-                    <td><MoneyCell value={line.unit_cost} /></td>
-                    <td>
+                    <td data-label={t("customerDetail.table.product")}>{line.product_name}</td>
+                    <td data-label={t("customerDetail.table.vendor")}>{line.vendor}</td>
+                    <td data-label={t("customerDetail.table.sku")}>{line.sku}</td>
+                    <td data-label={t("customerDetail.table.qty")}>{line.quantity}</td>
+                    <td data-label={t("customerDetail.table.unitCost")}><MoneyCell value={line.unit_cost} /></td>
+                    <td data-label={t("customerDetail.table.unitPrice")}>
                       <PriceCell customerId={customer.id} line={line} onUpdated={refresh} />
                     </td>
-                    <td>
+                    <td data-label={t("common.margin")}>
                       <MarginBadge margin={line.total_margin} marginPct={line.margin_pct} />
                     </td>
-                    <td>{line.billing_period ?? "—"}</td>
-                    <td>
+                    <td data-label={t("customerDetail.table.billing")}>{line.billing_period ?? "—"}</td>
+                    <td data-label={t("customerDetail.table.po")}>
                       <PoCell line={line} onUpdated={refresh} />
                     </td>
                   </tr>
@@ -358,6 +359,7 @@ export function CustomerDetailPage() {
                 )}
               </tbody>
             </table>
+            </div>
           </>
         )}
       </div>

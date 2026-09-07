@@ -73,7 +73,7 @@ export function SyncSidebarSection() {
         onClick={acronis.sync}
       />
       {(ion.error || ninjaone.error || acronis.error) && (
-        <span className="error-text small">{ion.error || ninjaone.error || acronis.error}</span>
+        <span className="error-text small" role="alert">{ion.error || ninjaone.error || acronis.error}</span>
       )}
     </div>
   );

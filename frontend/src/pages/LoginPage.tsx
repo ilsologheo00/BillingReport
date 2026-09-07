@@ -43,7 +43,7 @@ export function LoginPage() {
           {t("login.password")}
           <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
         </label>
-        {error && <div className="error-text">{error}</div>}
+        {error && <div className="error-text" role="alert">{error}</div>}
         <button type="submit" disabled={submitting}>
           {submitting ? t("login.signingIn") : t("login.signIn")}
         </button>

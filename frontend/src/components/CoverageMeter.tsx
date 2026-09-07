@@ -1,3 +1,5 @@
+import { useId } from "react";
+
 export function CoverageMeter({
   label,
   covered,
@@ -8,9 +10,10 @@ export function CoverageMeter({
   total: number;
 }) {
   const pct = total > 0 ? Math.round((covered / total) * 100) : 0;
+  const tooltipId = useId();
 
   return (
-    <div className="meter-row" tabIndex={0}>
+    <div className="meter-row" tabIndex={0} aria-describedby={tooltipId}>
       <span className="bar-label" title={label}>
         {label}
       </span>
@@ -18,7 +21,7 @@ export function CoverageMeter({
         <div className="meter-fill" style={{ width: `${pct}%` }} />
       </div>
       <span className="bar-value">{pct}%</span>
-      <div className="bar-tooltip" role="tooltip">
+      <div className="bar-tooltip" role="tooltip" id={tooltipId}>
         <strong>
           {covered} / {total}
         </strong>

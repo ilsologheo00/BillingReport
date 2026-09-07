@@ -38,6 +38,7 @@ export const translations = {
     "machineBreakdown.compact": "{server} server · {workstation} client · {vm} VM",
     "machineBreakdown.tooltip": "Server / client / virtual machines protected by Acronis backup",
     "common.notSet": "not set",
+    "common.actions": "Actions",
 
     "dashboard.eyebrow": "Overview",
     "dashboard.title": "Dashboard",
@@ -144,6 +145,7 @@ export const translations = {
     "machineBreakdown.compact": "{server} server · {workstation} client · {vm} VM",
     "machineBreakdown.tooltip": "Server / client / macchine virtuali protette dal backup Acronis",
     "common.notSet": "non impostato",
+    "common.actions": "Azioni",
 
     "dashboard.eyebrow": "Panoramica",
     "dashboard.title": "Dashboard",
