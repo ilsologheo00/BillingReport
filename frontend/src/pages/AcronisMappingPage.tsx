@@ -134,7 +134,7 @@ export function AcronisMappingPage() {
         {loading ? (
           <SkeletonTable rows={5} cols={6} />
         ) : (
-          <div className="table-scroll">
+          <div className="table-scroll reveal">
           <table className="data-table">
             <thead>
               <tr>

@@ -70,6 +70,7 @@ function PriceCell({ customerId, line, onUpdated }: { customerId: number; line: 
   const [value, setValue] = useState(line.unit_price ?? "");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [justSaved, setJustSaved] = useState(false);
 
   async function save() {
     if (value === "" || Number.isNaN(Number(value))) {
@@ -81,6 +82,7 @@ function PriceCell({ customerId, line, onUpdated }: { customerId: number; line: 
     try {
       await updatePrice(customerId, line.sku, value);
       onUpdated();
+      setJustSaved(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : t("customerDetail.failedToSave"));
     } finally {
@@ -101,6 +103,8 @@ function PriceCell({ customerId, line, onUpdated }: { customerId: number; line: 
           if (e.key === "Enter") (e.target as HTMLInputElement).blur();
         }}
         disabled={saving}
+        className={justSaved ? "just-saved" : undefined}
+        onAnimationEnd={() => setJustSaved(false)}
       />
       {error && <span className="error-text small" role="alert">{error}</span>}
     </div>
@@ -112,6 +116,7 @@ function PoCell({ line, onUpdated }: { line: LicenseLine; onUpdated: () => void 
   const [value, setValue] = useState(line.po_name ?? "");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [justSaved, setJustSaved] = useState(false);
 
   async function save() {
     if (value === (line.po_name ?? "")) return;
@@ -120,6 +125,7 @@ function PoCell({ line, onUpdated }: { line: LicenseLine; onUpdated: () => void 
     try {
       await updatePurchaseOrder(line.id, value);
       onUpdated();
+      setJustSaved(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : t("customerDetail.failedToSave"));
     } finally {
@@ -140,6 +146,8 @@ function PoCell({ line, onUpdated }: { line: LicenseLine; onUpdated: () => void 
           if (e.key === "Enter") (e.target as HTMLInputElement).blur();
         }}
         disabled={saving}
+        className={justSaved ? "just-saved" : undefined}
+        onAnimationEnd={() => setJustSaved(false)}
       />
       {error && <span className="error-text small" role="alert">{error}</span>}
     </div>
@@ -222,7 +230,7 @@ export function CustomerDetailPage() {
           </>
         ) : (
           <>
-            <div className="summary-bar">
+            <div className="summary-bar reveal">
               <div>
                 <span className="summary-label">{t("common.totalCost")}</span>
                 <span className="summary-value"><MoneyCell value={customer.total_cost} /></span>
@@ -239,7 +247,7 @@ export function CustomerDetailPage() {
               </div>
             </div>
 
-            <div className="charts-grid">
+            <div className="charts-grid reveal">
               <div className="chart-card">
                 <h2>{t("customerDetail.ninjaone.title")}</h2>
                 <div className="card-stat">
@@ -315,7 +323,7 @@ export function CustomerDetailPage() {
 
             <ConsolidationToggle customer={customer} onUpdated={refresh} />
 
-            <div className="table-scroll">
+            <div className="table-scroll reveal">
             <table className="data-table">
               <thead>
                 <tr>

@@ -85,7 +85,7 @@ export function DashboardPage() {
         {loading && !summary ? (
           <SkeletonStatBar count={4} />
         ) : summary ? (
-          <div className="summary-bar">
+          <div className="summary-bar reveal">
             <div>
               <span className="summary-label"><CustomersIcon width={14} height={14} /> {t("common.customers")}</span>
               <span className="summary-value">{summary.customer_count}</span>
@@ -108,7 +108,7 @@ export function DashboardPage() {
         ) : null}
 
         {!loading && customers.length > 0 && (
-          <div className="charts-grid">
+          <div className="charts-grid reveal">
             <div className="chart-card">
               <h2>{t("dashboard.topMargin.title")}</h2>
               <p className="chart-subtitle">{t("dashboard.topMargin.subtitle")}</p>
@@ -122,8 +122,8 @@ export function DashboardPage() {
               <p className="chart-subtitle">{t("dashboard.coverage.subtitle")}</p>
               {coverage.length > 0 ? (
                 <div className="bar-chart">
-                  {coverage.map((c) => (
-                    <CoverageMeter key={c.id} label={c.name} covered={c.sentinelone_count ?? 0} total={c.device_count ?? 0} />
+                  {coverage.map((c, index) => (
+                    <CoverageMeter key={c.id} label={c.name} covered={c.sentinelone_count ?? 0} total={c.device_count ?? 0} index={index} />
                   ))}
                 </div>
               ) : (
@@ -136,7 +136,7 @@ export function DashboardPage() {
         {loading ? (
           <SkeletonTable rows={6} cols={10} />
         ) : (
-          <div className="table-scroll">
+          <div className="table-scroll reveal">
           <table className="data-table">
             <thead>
               <tr>

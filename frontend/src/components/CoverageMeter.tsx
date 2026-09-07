@@ -4,16 +4,23 @@ export function CoverageMeter({
   label,
   covered,
   total,
+  index = 0,
 }: {
   label: string;
   covered: number;
   total: number;
+  index?: number;
 }) {
   const pct = total > 0 ? Math.round((covered / total) * 100) : 0;
   const tooltipId = useId();
 
   return (
-    <div className="meter-row" tabIndex={0} aria-describedby={tooltipId}>
+    <div
+      className="meter-row"
+      tabIndex={0}
+      aria-describedby={tooltipId}
+      style={{ animationDelay: `${Math.min(index, 8) * 30}ms` }}
+    >
       <span className="bar-label" title={label}>
         {label}
       </span>

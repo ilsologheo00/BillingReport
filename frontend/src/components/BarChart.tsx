@@ -6,10 +6,20 @@ interface BarChartItem {
   sublabel?: string;
 }
 
-function BarRow({ item, pct, formatValue }: { item: BarChartItem; pct: number; formatValue: (value: number) => string }) {
+function BarRow({
+  item,
+  pct,
+  index,
+  formatValue,
+}: {
+  item: BarChartItem;
+  pct: number;
+  index: number;
+  formatValue: (value: number) => string;
+}) {
   const tooltipId = useId();
   return (
-    <div className="bar-row" tabIndex={0} aria-describedby={tooltipId}>
+    <div className="bar-row" tabIndex={0} aria-describedby={tooltipId} style={{ animationDelay: `${Math.min(index, 8) * 30}ms` }}>
       <span className="bar-label" title={item.label}>
         {item.label}
       </span>
@@ -41,9 +51,9 @@ export function HorizontalBarChart({
 
   return (
     <div className="bar-chart">
-      {items.map((item) => {
+      {items.map((item, index) => {
         const pct = max > 0 ? Math.max((item.value / max) * 100, item.value > 0 ? 2 : 0) : 0;
-        return <BarRow key={item.label} item={item} pct={pct} formatValue={formatValue} />;
+        return <BarRow key={item.label} item={item} pct={pct} index={index} formatValue={formatValue} />;
       })}
       {items.length === 0 && <p className="empty-row">{noDataLabel}</p>}
     </div>

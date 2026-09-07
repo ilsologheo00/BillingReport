@@ -56,7 +56,7 @@ export function SyncSidebarSection() {
 
   return (
     <div className="sidebar-section">
-      <p className="sidebar-section-label">Sync</p>
+      <p className="sidebar-section-label">{t("nav.sync")}</p>
       <SyncItem label="ION" syncing={ion.syncing} lastSync={ion.lastSync} tooltip={tooltipFor(ion.lastSync)} onClick={ion.sync} />
       <SyncItem
         label="NinjaOne"

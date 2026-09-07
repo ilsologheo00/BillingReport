@@ -199,6 +199,7 @@ a {
   border-radius: 50%;
   flex-shrink: 0;
   background: var(--text-faint);
+  transition: background-color 200ms ease;
 }
 
 .sync-dot-success {
@@ -391,6 +392,12 @@ a {
   background: var(--surface);
   border-radius: 14px;
   box-shadow: var(--shadow-lg);
+  animation: login-in 450ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes login-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .login-form h1 {
@@ -552,6 +559,12 @@ button:disabled {
   gap: 10px;
   outline: none;
   border-radius: 6px;
+  animation: row-reveal 260ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes row-reveal {
+  from { opacity: 0; transform: translateX(-6px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
 .bar-row:focus-visible,
@@ -582,6 +595,13 @@ button:disabled {
   border-radius: 5px 4px 4px 5px;
   background: var(--chart-fill);
   transition: background 0.12s ease;
+  transform-origin: left;
+  animation: fill-grow 500ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes fill-grow {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
 }
 
 .bar-row:hover .bar-fill,
@@ -789,6 +809,12 @@ button:disabled {
 .error-text {
   color: var(--negative);
   font-size: 0.9rem;
+  animation: error-in 200ms ease-out both;
+}
+
+@keyframes error-in {
+  from { opacity: 0; transform: translateY(-2px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .error-text.small {
@@ -952,5 +978,42 @@ button:disabled {
   table.data-table td select,
   table.data-table .price-cell input {
     width: 100%;
+  }
+}
+
+/* -- Motion: state and feedback ---------------------------------------------- */
+/* Every animation here explains a state change (data replacing a skeleton,
+   a field save landing, an error appearing) or a data relationship (chart
+   fill magnitude, ranked-list order) - never decoration for its own sake. */
+
+.reveal {
+  animation: reveal-in 200ms ease-out both;
+}
+
+@keyframes reveal-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes field-saved {
+  from { background-color: color-mix(in srgb, var(--positive) 18%, var(--surface)); }
+  to { background-color: var(--surface); }
+}
+
+input.just-saved {
+  animation: field-saved 900ms ease-out;
+}
+
+/* Respect the user's OS-level motion preference. This collapses every
+   transition/animation above to effectively instant rather than removing it -
+   state changes (color, opacity, layout) still land, spatial movement and
+   infinite loops (sync pulse/spin, skeleton shimmer) just stop being animated. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
   }
 }
