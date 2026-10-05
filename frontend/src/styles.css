@@ -821,6 +821,231 @@ button:disabled {
   font-size: 0.75rem;
 }
 
+/* -- Dashboard (frontend-design pass) ----------------------------------------- */
+/* Scoped under .dash-page so every other page keeps its current look while this
+   one surface is reworked. Treated as a ledger, not a generic analytics widget:
+   margin is a calculation (price minus cost), not just another metric, and the
+   numbers are meant to be scanned and compared, not decorated. Brand navy/blue
+   and the existing Poppins/Roboto type kept as directed - the redesign is in
+   type scale, alignment and chrome (flat hairline sections, right-aligned
+   tabular figures), not a new typeface. Semantic tokens (--bg-page, --text,
+   --border, --surface) are reused throughout so light/dark mode keep working
+   without a parallel palette; the band is intentionally always navy regardless
+   of site theme. */
+
+.dash-band {
+  background: var(--navy);
+}
+
+.dash-band-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 22px 32px 26px;
+}
+
+.dash-band-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.dash-mark {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 1rem;
+  color: #fff;
+}
+
+.dash-search-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  color: rgba(238, 242, 248, 0.72);
+}
+
+.dash-search {
+  width: 220px;
+  padding: 7px 12px;
+  border-radius: 6px;
+  border: 1px solid rgba(238, 242, 248, 0.28);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+}
+
+.dash-search::placeholder {
+  color: rgba(238, 242, 248, 0.5);
+}
+
+.dash-search:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.dash-band-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.dash-title {
+  margin: 0;
+  font-size: 1.9rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: #fff;
+}
+
+.dash-client-count {
+  font-size: 0.85rem;
+  color: rgba(238, 242, 248, 0.68);
+}
+
+.dash-statement {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28px;
+}
+
+.dash-statement-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-right: 28px;
+  border-right: 1px solid rgba(238, 242, 248, 0.18);
+}
+
+.dash-statement-item:last-child {
+  border-right: none;
+  padding-right: 0;
+}
+
+.dash-statement-label {
+  font-size: 0.75rem;
+  color: rgba(238, 242, 248, 0.64);
+}
+
+.dash-statement-value {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+
+/* MarginBadge is tuned for a light card surface - the band is always navy
+   regardless of site theme, so it gets the app's own dark-theme positive/
+   negative hues (already proven readable on a dark surface) rather than the
+   default badge colors, which would lose contrast here. */
+.dash-statement-result .badge {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.dash-statement-result .badge-positive {
+  color: #3fbf6a;
+}
+
+.dash-statement-result .badge-negative {
+  color: #f0645f;
+}
+
+.dash-statement-result .badge-neutral {
+  color: rgba(238, 242, 248, 0.8);
+}
+
+.dash-band .skeleton {
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.08) 25%, rgba(255, 255, 255, 0.16) 37%, rgba(255, 255, 255, 0.08) 63%);
+  background-size: 400px 100%;
+}
+
+.dash-body {
+  background: var(--bg-page);
+}
+
+.dash-body-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 28px 32px 60px;
+}
+
+.dash-charts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  margin-bottom: 8px;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.dash-chart {
+  padding: 20px 24px;
+}
+
+.dash-chart + .dash-chart {
+  border-left: 1px solid var(--border);
+}
+
+.dash-chart h2 {
+  margin: 0 0 4px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.dash-chart-subtitle {
+  margin: 0 0 14px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.dash-ledger {
+  box-shadow: none;
+}
+
+.dash-ledger th {
+  text-transform: none;
+  letter-spacing: normal;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+.dash-ledger th.num,
+.dash-ledger td.num {
+  text-align: right;
+}
+
+@media (max-width: 760px) {
+  .dash-band-top {
+    flex-wrap: wrap;
+  }
+
+  .dash-search-label {
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    gap: 6px;
+  }
+
+  .dash-search {
+    width: 100%;
+  }
+
+  .dash-charts {
+    grid-template-columns: 1fr;
+  }
+
+  .dash-chart + .dash-chart {
+    border-left: none;
+    border-top: 1px solid var(--border);
+  }
+}
+
 /* -- Touch input ------------------------------------------------------------- */
 /* Screen width doesn't tell you input method - a touch laptop and a mouse-driven
    desktop can share a breakpoint. Target the pointer instead, so mouse users keep
@@ -857,6 +1082,26 @@ button:disabled {
 @media (max-width: 600px) {
   .page {
     padding: 18px 16px 40px;
+  }
+
+  .dash-band-inner {
+    padding: 16px 16px 20px;
+  }
+
+  .dash-body-inner {
+    padding: 18px 16px 40px;
+  }
+
+  .dash-title {
+    font-size: 1.5rem;
+  }
+
+  .dash-statement {
+    gap: 18px;
+  }
+
+  .dash-statement-item {
+    padding-right: 18px;
   }
 
   .page-header {

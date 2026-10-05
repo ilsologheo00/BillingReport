@@ -1,0 +1,14 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "roboto",
+        "createdAt": "2026-10-05T14:07:34.278Z",
+        "reason": "Pre-existing font used by every page except the redesigned Dashboard (Login, CustomerDetail, NinjaOne/Acronis mapping) - out of scope for this pass, which the user explicitly limited to the Dashboard only"
+      }
+    ]
+  }
+}
