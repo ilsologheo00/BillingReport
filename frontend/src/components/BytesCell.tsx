@@ -9,7 +9,7 @@ export function formatBytes(value: string | null): string {
     num /= 1024;
     unitIndex += 1;
   }
-  return `${num.toLocaleString(undefined, { maximumFractionDigits: 1 })} ${UNITS[unitIndex]}`;
+  return `${num.toLocaleString(undefined, { maximumFractionDigits: 2 })} ${UNITS[unitIndex]}`;
 }
 
 export function BytesCell({ value }: { value: string | null }) {
